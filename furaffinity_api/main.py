@@ -14,6 +14,7 @@ from pydantic import BaseModel
 from .__version__ import __version__
 from .exceptions import DisallowedPath
 from .exceptions import NotFound
+from .exceptions import Unauthorized
 from .models import Cookies
 from .models import Journal
 from .models import JournalsFolder
@@ -53,6 +54,11 @@ faapi.User.__iter__ = serialise_user
 @app.exception_handler(HTTPException)
 def handle_http_exception(_request: Request, err: HTTPException):
     return ORJSONResponse({"error": err.detail}, err.status_code)
+
+
+@app.exception_handler(faapi.exceptions.NoticeMessage)
+def handle_notice_message(request: Request, err: faapi.exceptions.NoticeMessage):
+    return handle_http_exception(_request, Unauthorized(401))
 
 
 # noinspection PyUnresolvedReferences

@@ -7,3 +7,7 @@ class NotFound(HTTPException):
 
 class DisallowedPath(HTTPException):
     pass
+
+
+class Unauthorized(HTTPException):
+    pass
