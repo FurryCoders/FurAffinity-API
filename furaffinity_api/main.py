@@ -86,28 +86,28 @@ def wait_ip(request: Request):
 @app.post("/submission/{submission_id}/",
           response_model=Submission, response_class=ORJSONResponse, tags=["submissions"])
 def get_submission(request: Request, submission_id: int, cookies: Cookies):
-    wait_ip(request)
     """
     Get a submission object. Public submissions can be queried without cookies.
     """
+    wait_ip(request)
     return faapi.FAAPI(cookies.to_list() if cookies else None).get_submission(submission_id)[0]
 
 
 @app.post("/journal/{journal_id}", response_model=Journal, response_class=ORJSONResponse, tags=["journals"])
 def get_journal(request: Request, journal_id: int, cookies: Cookies):
-    wait_ip(request)
     """
     Get a journal. Public journals can be queried without cookies.
     """
+    wait_ip(request)
     return faapi.FAAPI(cookies.to_list() if cookies else None).get_journal(journal_id)
 
 
 @app.post("/user/{username}/", response_model=User, response_class=ORJSONResponse, tags=["users"])
 def get_user(request: Request, username: str, cookies: Cookies):
+    """
+    Get a user's details, profile text, etc. The username may contain underscore (_) characters
+    """
     wait_ip(request)
-    """
-    Get a username details, profile text, etc. The username may contain underscore (_) characters
-    """
     return faapi.FAAPI(cookies.to_list() if cookies else None).get_user(username.replace("_", ""))
 
 
