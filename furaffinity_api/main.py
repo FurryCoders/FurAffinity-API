@@ -69,7 +69,7 @@ def handle_server_error(_request: Request, _err: faapi.exceptions.ServerError):
 
 # noinspection PyUnresolvedReferences
 @app.exception_handler(faapi.exceptions.DisallowedPath)
-def handle_server_error(_request: Request, _err: faapi.exceptions.ServerError):
+def handle_disallowed_path(_request: Request, _err: faapi.exceptions.ServerError):
     return handle_http_exception(_request, DisallowedPath(403))
 
 
