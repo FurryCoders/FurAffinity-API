@@ -8,7 +8,7 @@ import faapi
 from fastapi import FastAPI
 from fastapi import Request
 from fastapi.exceptions import HTTPException
-from fastapi.responses import ORJSONResponse
+from fastapi.responses import ORJSONResponse, RedirectResponse
 from pydantic import BaseModel
 
 from .__version__ import __version__
@@ -41,6 +41,8 @@ app: FastAPI = FastAPI(title="Fur Affinity API", version=__version__, openapi_ta
     {"name": "users", "description": "Get user information and folders"},
 ])
 ip_list = IPList()
+
+app.add_route("/", lambda r: RedirectResponse("/docs"), ["GET"])
 
 faapi.Submission.__iter__ = serialise_submission
 faapi.Journal.__iter__ = serialise_journal
