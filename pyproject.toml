@@ -9,6 +9,7 @@ python = "3.9.7"
 faapi = "^2.19.3"
 fastapi = "^0.70.0"
 orjson = "^3.6.4"
+uvicorn = "^0.15.0"
 
 [tool.poetry.dev-dependencies]
 
