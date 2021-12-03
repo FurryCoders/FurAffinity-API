@@ -15,7 +15,7 @@ from .__version__ import __version__
 from .exceptions import DisallowedPath
 from .exceptions import NotFound
 from .exceptions import Unauthorized
-from .models import Cookies
+from .models import Body
 from .models import Journal
 from .models import JournalsFolder
 from .models import Submission
