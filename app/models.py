@@ -14,10 +14,10 @@ class Cookie(BaseModel):
         return {"name": self.name, "value": self.value}
 
 
-class Cookies(BaseModel):
+class Body(BaseModel):
     cookies: list[Cookie] = []
-
-    def to_list(self) -> list[dict[str, str]]:
+    
+    def cookies_list(self) -> list[dict[str, str]]:
         return [c.to_dict() for c in self.cookies]
 
 

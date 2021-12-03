@@ -85,71 +85,71 @@ def wait_ip(request: Request):
 # noinspection GrazieInspection
 @app.post("/submission/{submission_id}/",
           response_model=Submission, response_class=ORJSONResponse, tags=["submissions"])
-def get_submission(request: Request, submission_id: int, cookies: Cookies = None):
+def get_submission(request: Request, submission_id: int, body: Body = None):
     """
     Get a submission object. Public submissions can be queried without cookies.
     """
     wait_ip(request)
-    return faapi.FAAPI(cookies.to_list() if cookies else None).get_submission(submission_id)[0]
+    return faapi.FAAPI(body.cookies_list() if body else None).get_submission(submission_id)[0]
 
 
 @app.post("/journal/{journal_id}", response_model=Journal, response_class=ORJSONResponse, tags=["journals"])
-def get_journal(request: Request, journal_id: int, cookies: Cookies = None):
+def get_journal(request: Request, journal_id: int, body: Body = None):
     """
     Get a journal. Public journals can be queried without cookies.
     """
     wait_ip(request)
-    return faapi.FAAPI(cookies.to_list() if cookies else None).get_journal(journal_id)
+    return faapi.FAAPI(body.cookies_list() if body else None).get_journal(journal_id)
 
 
 @app.post("/user/{username}/", response_model=User, response_class=ORJSONResponse, tags=["users"])
-def get_user(request: Request, username: str, cookies: Cookies = None):
+def get_user(request: Request, username: str, body: Body = None):
     """
     Get a user's details, profile text, etc. The username may contain underscore (_) characters
     """
     wait_ip(request)
-    return faapi.FAAPI(cookies.to_list() if cookies else None).get_user(username.replace("_", ""))
+    return faapi.FAAPI(body.cookies_list() if body else None).get_user(username.replace("_", ""))
 
 
 @app.post("/gallery/{username}/{page}/",
           response_model=SubmissionsFolder, response_class=ORJSONResponse, tags=["users", "submissions"])
-def get_gallery(request: Request, username: str, page: int, cookies: Cookies = None):
+def get_gallery(request: Request, username: str, page: int, body: Body = None):
     """
     Get a list of submissions from the user's gallery folder.
     """
     wait_ip(request)
-    r, n = faapi.FAAPI(cookies.to_list() if cookies else None).gallery(username.replace("_", ""), page)
+    r, n = faapi.FAAPI(body.cookies_list() if body else None).gallery(username.replace("_", ""), page)
     return {"results": r, "next": n or None}
 
 
 @app.post("/scraps/{username}/{page}/",
           response_model=SubmissionsFolder, response_class=ORJSONResponse, tags=["users", "submissions"])
-def get_scraps(request: Request, username: str, page: int, cookies: Cookies = None):
+def get_scraps(request: Request, username: str, page: int, body: Body = None):
     """
     Get a list of submissions from the user's scraps folder.
     """
     wait_ip(request)
-    r, n = faapi.FAAPI(cookies.to_list() if cookies else None).scraps(username.replace("_", ""), page)
+    r, n = faapi.FAAPI(body.cookies_list() if body else None).scraps(username.replace("_", ""), page)
     return {"results": r, "next": n or None}
 
 
 @app.post("/favorites/{username}/{page}/",
           response_model=SubmissionsFolder, response_class=ORJSONResponse, tags=["users", "submissions"])
-def get_favorites(request: Request, username: str, page: str, cookies: Cookies = None):
+def get_favorites(request: Request, username: str, page: str, body: Body = None):
     """
     Get a list of submissions from the user's favorites folder.
     """
     wait_ip(request)
-    r, n = faapi.FAAPI(cookies.to_list() if cookies else None).favorites(username.replace("_", ""), page)
+    r, n = faapi.FAAPI(body.cookies_list() if body else None).favorites(username.replace("_", ""), page)
     return {"results": r, "next": n or None}
 
 
 @app.post("/journals/{username}/{page}/",
           response_model=JournalsFolder, response_class=ORJSONResponse, tags=["users", "journals"])
-def get_scraps(request: Request, username: str, page: int, cookies: Cookies = None):
+def get_scraps(request: Request, username: str, page: int, body: Body = None):
     """
     Get a list of journals from the user's journals folder.
     """
     wait_ip(request)
-    r, n = faapi.FAAPI(cookies.to_list() if cookies else None).journals(username.replace("_", ""), page)
+    r, n = faapi.FAAPI(body.cookies_list() if body else None).journals(username.replace("_", ""), page)
     return {"results": r, "next": n or None}
