@@ -57,7 +57,7 @@ def handle_http_exception(_request: Request, err: HTTPException):
 
 
 @app.exception_handler(faapi.exceptions.NoticeMessage)
-def handle_notice_message(request: Request, err: faapi.exceptions.NoticeMessage):
+def handle_notice_message(_request: Request, err: faapi.exceptions.NoticeMessage):
     return handle_http_exception(_request, Unauthorized(401))
 
 
