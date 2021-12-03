@@ -5,6 +5,7 @@ from logging import getLogger
 import faapi
 from fastapi import FastAPI
 from fastapi import Request
+from fastapi import status
 from fastapi.exceptions import HTTPException
 from fastapi.responses import ORJSONResponse
 from fastapi.responses import RedirectResponse
@@ -44,22 +45,22 @@ faapi.User.__iter__ = serialise_user
 
 @app.exception_handler(HTTPException)
 def handle_http_exception(_request: Request, err: HTTPException):
-    return ORJSONResponse({"error": err.detail}, err.status_code)
+    return ORJSONResponse({"error": err.__class__.__name__, "details": err.detail}, err.status_code)
 
 
 @app.exception_handler(faapi.exceptions.NoticeMessage)
 def handle_notice_message(_request: Request, _err: faapi.exceptions.NoticeMessage):
-    return handle_http_exception(_request, Unauthorized(401))
+    return handle_http_exception(_request, Unauthorized(status.HTTP_401_UNAUTHORIZED))
 
 
 @app.exception_handler(faapi.exceptions.ServerError)
 def handle_server_error(_request: Request, _err: faapi.exceptions.ServerError):
-    return handle_http_exception(_request, NotFound(404))
+    return handle_http_exception(_request, NotFound(status.HTTP_404_NOT_FOUND))
 
 
 @app.exception_handler(faapi.exceptions.DisallowedPath)
 def handle_disallowed_path(_request: Request, _err: faapi.exceptions.ServerError):
-    return handle_http_exception(_request, DisallowedPath(403))
+    return handle_http_exception(_request, DisallowedPath(status.HTTP_403_FORBIDDEN))
 
 
 @app.post("/submission/{submission_id}/",
