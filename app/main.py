@@ -35,7 +35,6 @@ app: FastAPI = FastAPI(title="Fur Affinity API", version=__version__, openapi_ta
 
 app.add_route("/", lambda r: RedirectResponse("/docs"), ["GET"])
 
-# noinspection PyUnresolvedReferences
 faapi.connection.get_robots = lambda: robots
 faapi.Submission.__iter__ = serialise_submission
 faapi.Journal.__iter__ = serialise_journal
@@ -48,25 +47,21 @@ def handle_http_exception(_request: Request, err: HTTPException):
     return ORJSONResponse({"error": err.detail}, err.status_code)
 
 
-# noinspection PyUnresolvedReferences
 @app.exception_handler(faapi.exceptions.NoticeMessage)
 def handle_notice_message(_request: Request, _err: faapi.exceptions.NoticeMessage):
     return handle_http_exception(_request, Unauthorized(401))
 
 
-# noinspection PyUnresolvedReferences
 @app.exception_handler(faapi.exceptions.ServerError)
 def handle_server_error(_request: Request, _err: faapi.exceptions.ServerError):
     return handle_http_exception(_request, NotFound(404))
 
 
-# noinspection PyUnresolvedReferences
 @app.exception_handler(faapi.exceptions.DisallowedPath)
 def handle_disallowed_path(_request: Request, _err: faapi.exceptions.ServerError):
     return handle_http_exception(_request, DisallowedPath(403))
 
 
-# noinspection GrazieInspection
 @app.post("/submission/{submission_id}/",
           response_model=Submission, response_class=ORJSONResponse, tags=["submissions"])
 async def get_submission(submission_id: int, body: Body = None):
