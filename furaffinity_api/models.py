@@ -88,12 +88,12 @@ class Journal(BaseModel):
 
 class SubmissionsFolder(BaseModel):
     results: list[SubmissionPartial]
-    next: Union[int, str]
+    next: Optional[Union[int, str]]
 
 
 class JournalsFolder(BaseModel):
     results: list[Journal]
-    next: int
+    next: Optional[int]
 
 
 def serialise_journal(jrn: faapi.Journal):

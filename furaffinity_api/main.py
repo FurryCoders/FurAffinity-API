@@ -119,7 +119,7 @@ def get_gallery(request: Request, username: str, page: int, cookies: Cookies):
     """
     wait_ip(request)
     r, n = faapi.FAAPI(cookies.to_list() if cookies else None).gallery(username.replace("_", ""), page)
-    return {"results": r, "next": n}
+    return {"results": r, "next": n or None}
 
 
 @app.post("/scraps/{username}/{page}/",
@@ -130,7 +130,7 @@ def get_scraps(request: Request, username: str, page: int, cookies: Cookies):
     """
     wait_ip(request)
     r, n = faapi.FAAPI(cookies.to_list() if cookies else None).scraps(username.replace("_", ""), page)
-    return {"results": r, "next": n}
+    return {"results": r, "next": n or None}
 
 
 @app.post("/favorites/{username}/{page}/",
@@ -141,7 +141,7 @@ def get_favorites(request: Request, username: str, page: str, cookies: Cookies):
     """
     wait_ip(request)
     r, n = faapi.FAAPI(cookies.to_list() if cookies else None).favorites(username.replace("_", ""), page)
-    return {"results": r, "next": n}
+    return {"results": r, "next": n or None}
 
 
 @app.post("/journals/{username}/{page}/",
@@ -152,4 +152,4 @@ def get_scraps(request: Request, username: str, page: int, cookies: Cookies):
     """
     wait_ip(request)
     r, n = faapi.FAAPI(cookies.to_list() if cookies else None).journals(username.replace("_", ""), page)
-    return {"results": r, "next": n}
+    return {"results": r, "next": n or None}
