@@ -32,7 +32,10 @@ logger: Logger = getLogger("uvicorn")
 
 # noinspection PyUnresolvedReferences
 faapi.connection.get_robots = lambda: robots
-app: FastAPI = FastAPI(title="Fur Affinity API", version=__version__)
+app: FastAPI = FastAPI(title="Fur Affinity API", version=__version__, openapi_tags=[
+    {"name": "submissions", "description": "Get submissions"},
+    {"name": "users", "description": "Get user information and folders"},
+])
 ip_list = IPList()
 
 faapi.Submission.__iter__ = serialise_submission
@@ -67,7 +70,8 @@ def wait_ip(request: Request):
 
 
 # noinspection GrazieInspection
-@app.post("/submission/{submission_id}/", response_model=Submission, response_class=ORJSONResponse)
+@app.post("/submission/{submission_id}/",
+          response_model=Submission, response_class=ORJSONResponse, tags=["submissions"])
 def get_submission(request: Request, submission_id: int, cookies: Cookies):
     wait_ip(request)
     """
@@ -76,7 +80,7 @@ def get_submission(request: Request, submission_id: int, cookies: Cookies):
     return faapi.FAAPI(cookies.to_list() if cookies else None).get_submission(submission_id)[0]
 
 
-@app.post("/user/{username}/", response_model=User, response_class=ORJSONResponse)
+@app.post("/user/{username}/", response_model=User, response_class=ORJSONResponse, tags=["users"])
 def get_user(request: Request, username: str, cookies: Cookies):
     wait_ip(request)
     """
@@ -85,21 +89,24 @@ def get_user(request: Request, username: str, cookies: Cookies):
     return faapi.FAAPI(cookies.to_list() if cookies else None).get_user(username.replace("_", ""))
 
 
-@app.post("/gallery/{username}/{page}/", response_model=SubmissionsFolder, response_class=ORJSONResponse)
+@app.post("/gallery/{username}/{page}/",
+          response_model=SubmissionsFolder, response_class=ORJSONResponse, tags=["users", "submissions"])
 def get_gallery(request: Request, username: str, page: int, cookies: Cookies):
     wait_ip(request)
     r, n = faapi.FAAPI(cookies.to_list() if cookies else None).gallery(username.replace("_", ""), page)
     return {"results": r, "next": n}
 
 
-@app.post("/scraps/{username}/{page}/", response_model=SubmissionsFolder, response_class=ORJSONResponse)
+@app.post("/scraps/{username}/{page}/",
+          response_model=SubmissionsFolder, response_class=ORJSONResponse, tags=["users", "submissions"])
 def get_scraps(request: Request, username: str, page: int, cookies: Cookies):
     wait_ip(request)
     r, n = faapi.FAAPI(cookies.to_list() if cookies else None).scraps(username.replace("_", ""), page)
     return {"results": r, "next": n}
 
 
-@app.post("/favorites/{username}/{page}/", response_model=SubmissionsFolder, response_class=ORJSONResponse)
+@app.post("/favorites/{username}/{page}/",
+          response_model=SubmissionsFolder, response_class=ORJSONResponse, tags=["users", "submissions"])
 def get_favorites(request: Request, username: str, page: str, cookies: Cookies):
     wait_ip(request)
     r, n = faapi.FAAPI(cookies.to_list() if cookies else None).favorites(username.replace("_", ""), page)
