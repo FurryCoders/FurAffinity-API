@@ -1,6 +1,7 @@
 from asyncio import sleep
 from logging import Logger
 from logging import getLogger
+from typing import Any
 
 import faapi
 from fastapi import FastAPI
@@ -15,6 +16,7 @@ from .exceptions import DisallowedPath
 from .exceptions import NotFound
 from .exceptions import Unauthorized
 from .models import Body
+from .models import Error
 from .models import Journal
 from .models import JournalsFolder
 from .models import Submission
@@ -27,6 +29,12 @@ from .models import serialise_user_partial
 from .robots import robots
 
 logger: Logger = getLogger("uvicorn")
+
+responses: dict[int, dict[str, Any]] = {
+    status.HTTP_401_UNAUTHORIZED: {"description": "Unauthorized", "model": Error},
+    status.HTTP_403_FORBIDDEN: {"description": "Forbidden", "model": Error},
+    status.HTTP_404_NOT_FOUND: {"description": "Not Found", "model": Error},
+}
 
 app: FastAPI = FastAPI(title="Fur Affinity API", version=__version__, openapi_tags=[
     {"name": "submissions", "description": "Get submissions"},
@@ -64,7 +72,7 @@ def handle_disallowed_path(_request: Request, _err: faapi.exceptions.ServerError
 
 
 @app.post("/submission/{submission_id}/",
-          response_model=Submission, response_class=ORJSONResponse, tags=["submissions"])
+          response_model=Submission, response_class=ORJSONResponse, responses=responses, tags=["submissions"])
 async def get_submission(submission_id: int, body: Body = None):
     """
     Get a submission object. Public submissions can be queried without cookies.
@@ -74,7 +82,8 @@ async def get_submission(submission_id: int, body: Body = None):
     return results
 
 
-@app.post("/journal/{journal_id}", response_model=Journal, response_class=ORJSONResponse, tags=["journals"])
+@app.post("/journal/{journal_id}", response_model=Journal, response_class=ORJSONResponse, responses=responses,
+          tags=["journals"])
 async def get_journal(journal_id: int, body: Body = None):
     """
     Get a journal. Public journals can be queried without cookies.
@@ -84,7 +93,7 @@ async def get_journal(journal_id: int, body: Body = None):
     return results
 
 
-@app.post("/user/{username}/", response_model=User, response_class=ORJSONResponse, tags=["users"])
+@app.post("/user/{username}/", response_model=User, response_class=ORJSONResponse, responses=responses, tags=["users"])
 async def get_user(username: str, body: Body = None):
     """
     Get a user's details, profile text, etc. The username may contain underscore (_) characters
@@ -95,7 +104,8 @@ async def get_user(username: str, body: Body = None):
 
 
 @app.post("/gallery/{username}/{page}/",
-          response_model=SubmissionsFolder, response_class=ORJSONResponse, tags=["users", "submissions"])
+          response_model=SubmissionsFolder, response_class=ORJSONResponse, responses=responses,
+          tags=["users", "submissions"])
 async def get_gallery(username: str, page: int, body: Body = None):
     """
     Get a list of submissions from the user's gallery folder.
@@ -106,7 +116,8 @@ async def get_gallery(username: str, page: int, body: Body = None):
 
 
 @app.post("/scraps/{username}/{page}/",
-          response_model=SubmissionsFolder, response_class=ORJSONResponse, tags=["users", "submissions"])
+          response_model=SubmissionsFolder, response_class=ORJSONResponse, responses=responses,
+          tags=["users", "submissions"])
 async def get_scraps(username: str, page: int, body: Body = None):
     """
     Get a list of submissions from the user's scraps folder.
@@ -117,7 +128,8 @@ async def get_scraps(username: str, page: int, body: Body = None):
 
 
 @app.post("/favorites/{username}/{page}/",
-          response_model=SubmissionsFolder, response_class=ORJSONResponse, tags=["users", "submissions"])
+          response_model=SubmissionsFolder, response_class=ORJSONResponse, responses=responses,
+          tags=["users", "submissions"])
 async def get_favorites(username: str, page: str, body: Body = None):
     """
     Get a list of submissions from the user's favorites folder.
@@ -128,7 +140,7 @@ async def get_favorites(username: str, page: str, body: Body = None):
 
 
 @app.post("/journals/{username}/{page}/",
-          response_model=JournalsFolder, response_class=ORJSONResponse, tags=["users", "journals"])
+          response_model=JournalsFolder, response_class=ORJSONResponse, responses=responses, tags=["users", "journals"])
 async def get_scraps(username: str, page: int, body: Body = None):
     """
     Get a list of journals from the user's journals folder.

@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Any
 from typing import Optional
 from typing import Union
 
@@ -26,6 +27,13 @@ class Body(BaseModel):
 
     def cookies_list(self) -> list[dict[str, str]]:
         return [c.to_dict() for c in self.cookies]
+
+
+class Error(BaseModel):
+    """
+    Error response
+    """
+    details: Any = Field(description="details of the error")
 
 
 class UserStats(BaseModel):
