@@ -85,7 +85,7 @@ def wait_ip(request: Request):
 # noinspection GrazieInspection
 @app.post("/submission/{submission_id}/",
           response_model=Submission, response_class=ORJSONResponse, tags=["submissions"])
-def get_submission(request: Request, submission_id: int, cookies: Cookies):
+def get_submission(request: Request, submission_id: int, cookies: Cookies = None):
     """
     Get a submission object. Public submissions can be queried without cookies.
     """
@@ -94,7 +94,7 @@ def get_submission(request: Request, submission_id: int, cookies: Cookies):
 
 
 @app.post("/journal/{journal_id}", response_model=Journal, response_class=ORJSONResponse, tags=["journals"])
-def get_journal(request: Request, journal_id: int, cookies: Cookies):
+def get_journal(request: Request, journal_id: int, cookies: Cookies = None):
     """
     Get a journal. Public journals can be queried without cookies.
     """
@@ -103,7 +103,7 @@ def get_journal(request: Request, journal_id: int, cookies: Cookies):
 
 
 @app.post("/user/{username}/", response_model=User, response_class=ORJSONResponse, tags=["users"])
-def get_user(request: Request, username: str, cookies: Cookies):
+def get_user(request: Request, username: str, cookies: Cookies = None):
     """
     Get a user's details, profile text, etc. The username may contain underscore (_) characters
     """
@@ -113,7 +113,7 @@ def get_user(request: Request, username: str, cookies: Cookies):
 
 @app.post("/gallery/{username}/{page}/",
           response_model=SubmissionsFolder, response_class=ORJSONResponse, tags=["users", "submissions"])
-def get_gallery(request: Request, username: str, page: int, cookies: Cookies):
+def get_gallery(request: Request, username: str, page: int, cookies: Cookies = None):
     """
     Get a list of submissions from the user's gallery folder.
     """
@@ -124,7 +124,7 @@ def get_gallery(request: Request, username: str, page: int, cookies: Cookies):
 
 @app.post("/scraps/{username}/{page}/",
           response_model=SubmissionsFolder, response_class=ORJSONResponse, tags=["users", "submissions"])
-def get_scraps(request: Request, username: str, page: int, cookies: Cookies):
+def get_scraps(request: Request, username: str, page: int, cookies: Cookies = None):
     """
     Get a list of submissions from the user's scraps folder.
     """
@@ -135,7 +135,7 @@ def get_scraps(request: Request, username: str, page: int, cookies: Cookies):
 
 @app.post("/favorites/{username}/{page}/",
           response_model=SubmissionsFolder, response_class=ORJSONResponse, tags=["users", "submissions"])
-def get_favorites(request: Request, username: str, page: str, cookies: Cookies):
+def get_favorites(request: Request, username: str, page: str, cookies: Cookies = None):
     """
     Get a list of submissions from the user's favorites folder.
     """
@@ -146,7 +146,7 @@ def get_favorites(request: Request, username: str, page: str, cookies: Cookies):
 
 @app.post("/journals/{username}/{page}/",
           response_model=JournalsFolder, response_class=ORJSONResponse, tags=["users", "journals"])
-def get_scraps(request: Request, username: str, page: int, cookies: Cookies):
+def get_scraps(request: Request, username: str, page: int, cookies: Cookies = None):
     """
     Get a list of journals from the user's journals folder.
     """
