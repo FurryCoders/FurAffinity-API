@@ -77,9 +77,32 @@ class Submission(BaseModel):
     thumbnail_url: str
 
 
+class Journal(BaseModel):
+    id: int
+    title: str
+    date: datetime
+    author: UserPartial
+    content: str
+    mentions: list[str]
+
+
 class SubmissionsFolder(BaseModel):
     results: list[SubmissionPartial]
     next: Union[int, str]
+
+
+class JournalsFolder(BaseModel):
+    results: list[Journal]
+    next: int
+
+
+def serialise_journal(jrn: faapi.Journal):
+    yield "id", jrn.id
+    yield "title", jrn.title
+    yield "date", jrn.date
+    yield "author", jrn.author
+    yield "content", jrn.content
+    yield "mentions", jrn.mentions
 
 
 def serialise_submission(sub: faapi.Submission):

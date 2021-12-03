@@ -15,9 +15,12 @@ from .__version__ import __version__
 from .exceptions import DisallowedPath
 from .exceptions import NotFound
 from .models import Cookies
+from .models import Journal
+from .models import JournalsFolder
 from .models import Submission
 from .models import SubmissionsFolder
 from .models import User
+from .models import serialise_journal
 from .models import serialise_submission
 from .models import serialise_user
 from .models import serialise_user_partial
@@ -34,11 +37,13 @@ logger: Logger = getLogger("uvicorn")
 faapi.connection.get_robots = lambda: robots
 app: FastAPI = FastAPI(title="Fur Affinity API", version=__version__, openapi_tags=[
     {"name": "submissions", "description": "Get submissions"},
+    {"name": "journals", "description": "Get journals"},
     {"name": "users", "description": "Get user information and folders"},
 ])
 ip_list = IPList()
 
 faapi.Submission.__iter__ = serialise_submission
+faapi.Journal.__iter__ = serialise_journal
 faapi.UserPartial.__iter__ = serialise_user_partial
 faapi.User.__iter__ = serialise_user
 
@@ -80,6 +85,15 @@ def get_submission(request: Request, submission_id: int, cookies: Cookies):
     return faapi.FAAPI(cookies.to_list() if cookies else None).get_submission(submission_id)[0]
 
 
+@app.post("/journal/{journal_id}", response_model=Journal, response_class=ORJSONResponse, tags=["journals"])
+def get_journal(request: Request, journal_id: int, cookies: Cookies):
+    wait_ip(request)
+    """
+    Get a journal. Public journals can be queried without cookies.
+    """
+    return faapi.FAAPI(cookies.to_list() if cookies else None).get_journal(journal_id)
+
+
 @app.post("/user/{username}/", response_model=User, response_class=ORJSONResponse, tags=["users"])
 def get_user(request: Request, username: str, cookies: Cookies):
     wait_ip(request)
@@ -119,4 +133,15 @@ def get_favorites(request: Request, username: str, page: str, cookies: Cookies):
     """
     wait_ip(request)
     r, n = faapi.FAAPI(cookies.to_list() if cookies else None).favorites(username.replace("_", ""), page)
+    return {"results": r, "next": n}
+
+
+@app.post("/journals/{username}/{page}/",
+          response_model=JournalsFolder, response_class=ORJSONResponse, tags=["users", "journals"])
+def get_scraps(request: Request, username: str, page: int, cookies: Cookies):
+    """
+    Get a list of journals from the user's journals folder.
+    """
+    wait_ip(request)
+    r, n = faapi.FAAPI(cookies.to_list() if cookies else None).journals(username.replace("_", ""), page)
     return {"results": r, "next": n}
