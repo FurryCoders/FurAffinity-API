@@ -3,97 +3,127 @@ from typing import Optional
 from typing import Union
 
 import faapi
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class Cookie(BaseModel):
-    name: str
-    value: str
+    """
+    Container for the cookies used to connect to Fur Affinity
+    """
+    name: str = Field(description="The name of the cookie (a, b, etc.)")
+    value: str = Field(description="The value of the cookie (e.g. 5dabd975-436f-4af7-b949-f5d0f1e803a0)")
 
     def to_dict(self) -> dict[str, str]:
         return {"name": self.name, "value": self.value}
 
 
 class Body(BaseModel):
-    cookies: list[Cookie] = []
-    
+    """
+    Request body with authentication fields
+    """
+    cookies: list[Cookie] = Field([], description="A list of cookies to use to authenticate the request")
+
     def cookies_list(self) -> list[dict[str, str]]:
         return [c.to_dict() for c in self.cookies]
 
 
 class UserStats(BaseModel):
-    views: int
-    submissions: int
-    favs: int
-    comments_earned: int
-    comments_made: int
-    journals: int
+    """
+    User statistics
+    """
+    views: int = Field(description="Number of views")
+    submissions: int = Field(description="Number of submissions")
+    favs: int = Field(description="Number of favorites")
+    comments_earned: int = Field(description="Number of comments earned")
+    comments_made: int = Field(description="Number of comments made")
+    journals: int = Field(description="Number of journals")
 
 
 class UserPartial(BaseModel):
-    name: str
-    status: Optional[str]
-    title: str
-    user_icon_url: str
-    join_date: Optional[datetime]
+    """
+    Simplified user information
+    """
+    name: str = Field(description="User's name (as it appears on their page)")
+    status: Optional[str] = Field(description="User's status (~, !, etc.)")
+    title: str = Field(description="User's title")
+    user_icon_url: str = Field(description="URL to user's icon")
+    join_date: Optional[datetime] = Field(description="User's join_date")
 
 
 class User(BaseModel):
-    name: str
-    status: str
-    title: str
-    join_date: datetime
-    profile: str
-    stats: UserStats
-    info: dict[str, str]
-    contacts: dict[str, str]
-    user_icon_url: str
+    """
+    User information from their personal page
+    """
+    name: str = Field(description="User's name (as it appears on their page)")
+    status: str = Field(description="User's status (~, !, etc.)")
+    title: str = Field(description="User's title")
+    join_date: datetime = Field(description="User's join_date")
+    profile: str = Field(description="User's profile text in HTML format")
+    stats: UserStats = Field(description="User's statistics")
+    info: dict[str, str] = Field(description="User's info (e.g. Accepting Commissions, Favorite Music, etc.)")
+    contacts: dict[str, str] = Field(description="User's contacts (e.g. Twitter, Telegram, etc.)")
+    user_icon_url: str = Field(description="URL to user's icon")
 
 
 class SubmissionPartial(BaseModel):
-    id: int
-    title: str
+    """
+    Simplified submission information
+    """
+    id: int = Field(description="Submission's ID")
+    title: str = Field(description="Submission's title")
     author: UserPartial
-    rating: str
-    type: str
-    thumbnail_url: str
+    rating: str = Field(description="Submission's rating (e.g. general, mature, etc.)")
+    type: str = Field(description="Submission's type (i.e. image, text, music)")
+    thumbnail_url: str = Field(description="URL to submission's thumbnail")
 
 
 class Submission(BaseModel):
-    id: int
-    title: str
+    """
+    Submission information as it appears on the submission's page
+    """
+    id: int = Field(description="Submission's ID")
+    title: str = Field(description="Submission's title")
     author: UserPartial
-    date: datetime
-    tags: list[str]
-    category: str
-    species: str
-    gender: str
-    rating: str
-    type: str
-    description: str
-    mentions: list[str]
-    folder: str
-    file_url: str
-    thumbnail_url: str
+    date: datetime = Field(description="Submission's upload date")
+    tags: list[str] = Field(description="Submission's tags")
+    category: str = Field(description="Submission's category (e.g. Artwork)")
+    species: str = Field(description="Submission's species")
+    gender: str = Field(description="Submission's gender")
+    rating: str = Field(description="Submission's rating (e.g. general, mature, etc.)")
+    type: str = Field(description="Submission's type (i.e. image, text, music)")
+    description: str = Field(description="Submission's description")
+    mentions: list[str] = Field(description="Submission's mentions (users mentioned with FA links in the description)")
+    folder: str = Field(description="Submission's folder (i.e. gallery or scraps)")
+    file_url: str = Field(description="URL to submission's file")
+    thumbnail_url: str = Field(description="URL to submission's thumbnail")
 
 
 class Journal(BaseModel):
-    id: int
-    title: str
-    date: datetime
+    """
+    Journal information as it appears in the journals' page
+    """
+    id: int = Field(description="Journal's ID")
+    title: str = Field(description="Journal's title")
     author: UserPartial
-    content: str
-    mentions: list[str]
+    date: datetime = Field(description="Journal's upload date")
+    content: str = Field(description="Journal's title")
+    mentions: list[str] = Field(description="Journal's mentions (users mentioned with FA links in the content)")
 
 
 class SubmissionsFolder(BaseModel):
-    results: list[SubmissionPartial]
-    next: Optional[Union[int, str]]
+    """
+    Submissions appearing in a submissions page (e.g. gallery page)
+    """
+    results: list[SubmissionPartial] = Field(description="List of submissions found in the page")
+    next: Optional[Union[int, str]] = Field(description="Number of the next page, null if last page")
 
 
 class JournalsFolder(BaseModel):
-    results: list[Journal]
-    next: Optional[int]
+    """
+    Journals appearing in a journals page
+    """
+    results: list[Journal] = Field(description="List of journals found in the page")
+    next: Optional[int] = Field(description="Number of the next page, null if last page")
 
 
 def serialise_journal(jrn: faapi.Journal):
