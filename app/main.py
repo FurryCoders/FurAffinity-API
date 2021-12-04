@@ -9,6 +9,7 @@ from fastapi import Request
 from fastapi import status
 from fastapi.exceptions import HTTPException
 from fastapi.responses import ORJSONResponse
+from fastapi.responses import PlainTextResponse
 from fastapi.responses import RedirectResponse
 
 from .__version__ import __version__
@@ -48,7 +49,8 @@ app: FastAPI = FastAPI(title="Fur Affinity API", version=__version__, openapi_ta
     {"name": "users", "description": "Get user information and folders"},
 ])
 app.add_route("/", lambda r: RedirectResponse("/docs"), ["GET"])
-app.add_route("/robots.txt", lambda r: RedirectResponse("/robots.json"), ["GET"])
+app.add_route("/robots.txt",
+              lambda r: PlainTextResponse("\n\n".join("\n".join(f"{k}: {v}" for v in vs) for k, vs in robots.items())))
 app.add_route("/robots.json", lambda r: ORJSONResponse(robots), ["GET"])
 
 
