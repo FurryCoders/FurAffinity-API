@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "fur-affinity-api"
+name = "app"
 version = "0.1.0"
 description = ""
 authors = ["Matteo Campinoti <matteo.campinoti94@gmail.com>"]
