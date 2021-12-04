@@ -37,17 +37,19 @@ faapi.User.__iter__ = serialise_user
 
 logger: Logger = getLogger("uvicorn")
 
+tags: list[dict[str, Any]] = [
+    {"name": "submissions", "description": "Get submissions"},
+    {"name": "journals", "description": "Get journals"},
+    {"name": "users", "description": "Get user information and folders"},
+]
+
 responses: dict[int, dict[str, Any]] = {
     status.HTTP_401_UNAUTHORIZED: {"description": "Unauthorized", "model": Error},
     status.HTTP_403_FORBIDDEN: {"description": "Forbidden", "model": Error},
     status.HTTP_404_NOT_FOUND: {"description": "Not Found", "model": Error},
 }
 
-app: FastAPI = FastAPI(title="Fur Affinity API", version=__version__, openapi_tags=[
-    {"name": "submissions", "description": "Get submissions"},
-    {"name": "journals", "description": "Get journals"},
-    {"name": "users", "description": "Get user information and folders"},
-])
+app: FastAPI = FastAPI(title="Fur Affinity API", version=__version__, openapi_tags=tags)
 app.add_route("/", lambda r: RedirectResponse("/docs"), ["GET"])
 app.add_route("/robots.txt",
               lambda r: PlainTextResponse("\n\n".join("\n".join(f"{k}: {v}" for v in vs) for k, vs in robots.items())))
