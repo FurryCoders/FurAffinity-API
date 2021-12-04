@@ -31,6 +31,8 @@ from .models import serialise_user_partial
 
 robots: dict[str, list[str]] = faapi.connection.get_robots()
 faapi.connection.get_robots = lambda: robots
+faapi.FAAPI.handle_delay = lambda *_: None
+faapi.FAAPI.check_path = lambda *_: None
 faapi.Submission.__iter__ = serialise_submission
 faapi.Journal.__iter__ = serialise_journal
 faapi.UserPartial.__iter__ = serialise_user_partial
