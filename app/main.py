@@ -26,7 +26,13 @@ from .models import serialise_journal
 from .models import serialise_submission
 from .models import serialise_user
 from .models import serialise_user_partial
-from .robots import robots
+
+robots: dict[str, list[str]] = faapi.connection.get_robots()
+faapi.connection.get_robots = lambda: robots
+faapi.Submission.__iter__ = serialise_submission
+faapi.Journal.__iter__ = serialise_journal
+faapi.UserPartial.__iter__ = serialise_user_partial
+faapi.User.__iter__ = serialise_user
 
 logger: Logger = getLogger("uvicorn")
 
@@ -41,14 +47,9 @@ app: FastAPI = FastAPI(title="Fur Affinity API", version=__version__, openapi_ta
     {"name": "journals", "description": "Get journals"},
     {"name": "users", "description": "Get user information and folders"},
 ])
-
 app.add_route("/", lambda r: RedirectResponse("/docs"), ["GET"])
-
-faapi.connection.get_robots = lambda: robots
-faapi.Submission.__iter__ = serialise_submission
-faapi.Journal.__iter__ = serialise_journal
-faapi.UserPartial.__iter__ = serialise_user_partial
-faapi.User.__iter__ = serialise_user
+app.add_route("/robots.txt", lambda r: RedirectResponse("/robots.json"), ["GET"])
+app.add_route("/robots.json", lambda r: ORJSONResponse(robots), ["GET"])
 
 
 @app.exception_handler(HTTPException)
