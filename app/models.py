@@ -66,7 +66,7 @@ class User(BaseModel):
     name: str = Field(description="User's name (as it appears on their page)")
     status: str = Field(description="User's status (~, !, etc.)")
     title: str = Field(description="User's title")
-    join_date: datetime = Field(description="User's join_date")
+    join_date: Optional[datetime] = Field(description="User's join_date")
     profile: str = Field(description="User's profile text in HTML format")
     stats: UserStats = Field(description="User's statistics")
     info: dict[str, str] = Field(description="User's info (e.g. Accepting Commissions, Favorite Music, etc.)")
@@ -166,7 +166,7 @@ def serialise_user(usr: faapi.User):
     yield "name", usr.name
     yield "status", usr.status
     yield "title", usr.title
-    yield "join_date", usr.join_date
+    yield "join_date", usr.join_date if usr.join_date.timestamp() > 0 else None
     yield "profile", usr.profile
     # noinspection PyProtectedMember
     yield "stats", usr.stats._asdict()

@@ -23,6 +23,7 @@ from .models import JournalsFolder
 from .models import Submission
 from .models import SubmissionsFolder
 from .models import User
+from .models import UserPartial
 from .models import serialise_journal
 from .models import serialise_submission
 from .models import serialise_user
@@ -104,6 +105,28 @@ async def get_user(username: str, body: Body = None):
     Get a user's details, profile text, etc. The username may contain underscore (_) characters
     """
     results = (api := faapi.FAAPI(body.cookies_list() if body else None)).get_user(username.replace("_", ""))
+    await sleep(api.crawl_delay)
+    return results
+
+
+@app.post("/user/{username}/watchlist/by/", response_model=list[UserPartial], response_class=ORJSONResponse,
+          responses=responses, tags=["users"])
+async def get_user_whatchlist_by(username: str, body: Body = None):
+    """
+    Get a list of users watched by {username}
+    """
+    results = (api := faapi.FAAPI(body.cookies_list() if body else None)).watchlist_by(username.replace("_", ""))
+    await sleep(api.crawl_delay)
+    return results
+
+
+@app.post("/user/{username}/watchlist/to/", response_model=list[UserPartial], response_class=ORJSONResponse,
+          responses=responses, tags=["users"])
+async def get_user_whatchlist_by(username: str, body: Body = None):
+    """
+    Get a list of users watching {username}
+    """
+    results = (api := faapi.FAAPI(body.cookies_list() if body else None)).watchlist_to(username.replace("_", ""))
     await sleep(api.crawl_delay)
     return results
 
