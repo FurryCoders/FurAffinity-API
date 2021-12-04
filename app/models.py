@@ -56,7 +56,7 @@ class UserPartial(BaseModel):
     status: Optional[str] = Field(description="User's status (~, !, etc.)")
     title: str = Field(description="User's title")
     user_icon_url: str = Field(description="URL to user's icon")
-    join_date: Optional[datetime] = Field(description="User's join_date")
+    join_date: Optional[datetime] = Field(description="User's join date")
 
 
 class User(BaseModel):
@@ -66,7 +66,7 @@ class User(BaseModel):
     name: str = Field(description="User's name (as it appears on their page)")
     status: str = Field(description="User's status (~, !, etc.)")
     title: str = Field(description="User's title")
-    join_date: Optional[datetime] = Field(description="User's join_date")
+    join_date: Optional[datetime] = Field(description="User's join date")
     profile: str = Field(description="User's profile text in HTML format")
     stats: UserStats = Field(description="User's statistics")
     info: dict[str, str] = Field(description="User's info (e.g. Accepting Commissions, Favorite Music, etc.)")
