@@ -1,6 +1,4 @@
 from asyncio import sleep
-from logging import Logger
-from logging import getLogger
 from typing import Any
 
 import faapi
@@ -37,8 +35,6 @@ faapi.Submission.__iter__ = serialise_submission
 faapi.Journal.__iter__ = serialise_journal
 faapi.UserPartial.__iter__ = serialise_user_partial
 faapi.User.__iter__ = serialise_user
-
-logger: Logger = getLogger("uvicorn")
 
 tags: list[dict[str, Any]] = [
     {"name": "submissions", "description": "Get submissions"},
