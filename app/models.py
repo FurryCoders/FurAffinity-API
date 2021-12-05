@@ -4,8 +4,11 @@ from typing import Optional
 from typing import Union
 
 import faapi
+from fastapi import status
 from pydantic import BaseModel
 from pydantic import Field
+
+from .exceptions import Unauthorized
 
 
 class Cookie(BaseModel):
@@ -27,6 +30,10 @@ class Body(BaseModel):
 
     def cookies_list(self) -> list[dict[str, str]]:
         return [c.to_dict() for c in self.cookies]
+
+    def cookies_check(self):
+        if not self.cookies:
+            raise Unauthorized(status.HTTP_401_UNAUTHORIZED)
 
 
 class Error(BaseModel):
