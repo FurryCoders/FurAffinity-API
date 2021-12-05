@@ -23,7 +23,7 @@ from .models import JournalsFolder
 from .models import Submission
 from .models import SubmissionsFolder
 from .models import User
-from .models import UserPartial
+from .models import Watchlist
 from .models import serialise_journal
 from .models import serialise_submission
 from .models import serialise_user
@@ -85,7 +85,7 @@ async def get_submission(submission_id: int, body: Body = None):
     """
     Get a submission object. Public submissions can be queried without cookies.
     """
-    results = (api := faapi.FAAPI(body.cookies_list() if body else None)).get_submission(submission_id)[0]
+    results = (api := faapi.FAAPI(body.cookies_list() if body else None)).submission(submission_id)[0]
     await sleep(api.crawl_delay)
     return results
 
@@ -96,7 +96,7 @@ async def get_journal(journal_id: int, body: Body = None):
     """
     Get a journal. Public journals can be queried without cookies.
     """
-    results = (api := faapi.FAAPI(body.cookies_list() if body else None)).get_journal(journal_id)
+    results = (api := faapi.FAAPI(body.cookies_list() if body else None)).journal(journal_id)
     await sleep(api.crawl_delay)
     return results
 
@@ -106,31 +106,31 @@ async def get_user(username: str, body: Body = None):
     """
     Get a user's details, profile text, etc. The username may contain underscore (_) characters
     """
-    results = (api := faapi.FAAPI(body.cookies_list() if body else None)).get_user(username.replace("_", ""))
+    results = (api := faapi.FAAPI(body.cookies_list() if body else None)).user(username.replace("_", ""))
     await sleep(api.crawl_delay)
     return results
 
 
-@app.post("/user/{username}/watchlist/by/", response_model=list[UserPartial], response_class=ORJSONResponse,
+@app.post("/user/{username}/watchlist/by/{page}/", response_model=Watchlist, response_class=ORJSONResponse,
           responses=responses, tags=["users"])
-async def get_user_whatchlist_by(username: str, body: Body = None):
+async def get_user_whatchlist_by(username: str, page: int, body: Body = None):
     """
     Get a list of users watched by {username}
     """
-    results = (api := faapi.FAAPI(body.cookies_list() if body else None)).watchlist_by(username.replace("_", ""))
+    r, n = (api := faapi.FAAPI(body.cookies_list() if body else None)).watchlist_by(username.replace("_", ""), page)
     await sleep(api.crawl_delay)
-    return results
+    return {"results": r, "next": n or None}
 
 
-@app.post("/user/{username}/watchlist/to/", response_model=list[UserPartial], response_class=ORJSONResponse,
+@app.post("/user/{username}/watchlist/to/{page}/", response_model=Watchlist, response_class=ORJSONResponse,
           responses=responses, tags=["users"])
-async def get_user_whatchlist_by(username: str, body: Body = None):
+async def get_user_whatchlist_by(username: str, page: int, body: Body = None):
     """
     Get a list of users watching {username}
     """
-    results = (api := faapi.FAAPI(body.cookies_list() if body else None)).watchlist_to(username.replace("_", ""))
+    r, n = (api := faapi.FAAPI(body.cookies_list() if body else None)).watchlist_to(username.replace("_", ""), page)
     await sleep(api.crawl_delay)
-    return results
+    return {"results": r, "next": n or None}
 
 
 @app.post("/gallery/{username}/{page}/",

@@ -135,6 +135,14 @@ class JournalsFolder(BaseModel):
     next: Optional[int] = Field(description="Number of the next page, null if last page")
 
 
+class Watchlist(BaseModel):
+    """
+    Users appearing in a user's watchlist
+    """
+    results: list[UserPartial] = Field(description="List of users found in the page")
+    next: Optional[int] = Field(description="Number of the next page, null if last page")
+
+
 def serialise_journal(jrn: faapi.Journal):
     yield "id", jrn.id
     yield "title", jrn.title
