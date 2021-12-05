@@ -164,12 +164,12 @@ async def get_scraps(username: str, page: int, body: Body):
     return {"results": r, "next": n or None}
 
 
-@app.post("/user/{username}/favorites/{page:path}/",
+@app.post("/user/{username}/favorites/{page:path}",
           response_model=SubmissionsFolder, response_class=ORJSONResponse, responses=responses,
           tags=["users", "submissions"])
 async def get_favorites(username: str, page: str, body: Body):
     """
-    Get a list of submissions from the user's favorites folder.
+    Get a list of submissions from the user's favorites folder. Starting page should be 0 or '/'.
     """
     body.cookies_check()
     r, n = (api := faapi.FAAPI(body.cookies_list())).favorites(username.replace("_", ""), page)
