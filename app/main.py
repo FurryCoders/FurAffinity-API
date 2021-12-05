@@ -81,54 +81,59 @@ def handle_disallowed_path(_request: Request, _err: faapi.exceptions.ServerError
 
 @app.post("/submission/{submission_id}/",
           response_model=Submission, response_class=ORJSONResponse, responses=responses, tags=["submissions"])
-async def get_submission(submission_id: int, body: Body = None):
+async def get_submission(submission_id: int, body: Body):
     """
-    Get a submission object. Public submissions can be queried without cookies.
+    Get a submission
     """
-    results = (api := faapi.FAAPI(body.cookies_list() if body else None)).submission(submission_id)[0]
+    body.cookies_check()
+    results = (api := faapi.FAAPI(body.cookies_list())).submission(submission_id)[0]
     await sleep(api.crawl_delay)
     return results
 
 
 @app.post("/journal/{journal_id}", response_model=Journal, response_class=ORJSONResponse, responses=responses,
           tags=["journals"])
-async def get_journal(journal_id: int, body: Body = None):
+async def get_journal(journal_id: int, body: Body):
     """
-    Get a journal. Public journals can be queried without cookies.
+    Get a journal
     """
-    results = (api := faapi.FAAPI(body.cookies_list() if body else None)).journal(journal_id)
+    body.cookies_check()
+    results = (api := faapi.FAAPI(body.cookies_list())).journal(journal_id)
     await sleep(api.crawl_delay)
     return results
 
 
 @app.post("/user/{username}/", response_model=User, response_class=ORJSONResponse, responses=responses, tags=["users"])
-async def get_user(username: str, body: Body = None):
+async def get_user(username: str, body: Body):
     """
     Get a user's details, profile text, etc. The username may contain underscore (_) characters
     """
-    results = (api := faapi.FAAPI(body.cookies_list() if body else None)).user(username.replace("_", ""))
+    body.cookies_check()
+    results = (api := faapi.FAAPI(body.cookies_list())).user(username.replace("_", ""))
     await sleep(api.crawl_delay)
     return results
 
 
 @app.post("/user/{username}/watchlist/by/{page}/", response_model=Watchlist, response_class=ORJSONResponse,
           responses=responses, tags=["users"])
-async def get_user_whatchlist_by(username: str, page: int, body: Body = None):
+async def get_user_whatchlist_by(username: str, page: int, body: Body):
     """
     Get a list of users watched by {username}
     """
-    r, n = (api := faapi.FAAPI(body.cookies_list() if body else None)).watchlist_by(username.replace("_", ""), page)
+    body.cookies_check()
+    r, n = (api := faapi.FAAPI(body.cookies_list())).watchlist_by(username.replace("_", ""), page)
     await sleep(api.crawl_delay)
     return {"results": r, "next": n or None}
 
 
 @app.post("/user/{username}/watchlist/to/{page}/", response_model=Watchlist, response_class=ORJSONResponse,
           responses=responses, tags=["users"])
-async def get_user_whatchlist_by(username: str, page: int, body: Body = None):
+async def get_user_whatchlist_by(username: str, page: int, body: Body):
     """
     Get a list of users watching {username}
     """
-    r, n = (api := faapi.FAAPI(body.cookies_list() if body else None)).watchlist_to(username.replace("_", ""), page)
+    body.cookies_check()
+    r, n = (api := faapi.FAAPI(body.cookies_list())).watchlist_to(username.replace("_", ""), page)
     await sleep(api.crawl_delay)
     return {"results": r, "next": n or None}
 
@@ -136,11 +141,12 @@ async def get_user_whatchlist_by(username: str, page: int, body: Body = None):
 @app.post("/gallery/{username}/{page}/",
           response_model=SubmissionsFolder, response_class=ORJSONResponse, responses=responses,
           tags=["users", "submissions"])
-async def get_gallery(username: str, page: int, body: Body = None):
+async def get_gallery(username: str, page: int, body: Body):
     """
     Get a list of submissions from the user's gallery folder.
     """
-    r, n = (api := faapi.FAAPI(body.cookies_list() if body else None)).gallery(username.replace("_", ""), page)
+    body.cookies_check()
+    r, n = (api := faapi.FAAPI(body.cookies_list())).gallery(username.replace("_", ""), page)
     await sleep(api.crawl_delay)
     return {"results": r, "next": n or None}
 
@@ -148,11 +154,12 @@ async def get_gallery(username: str, page: int, body: Body = None):
 @app.post("/scraps/{username}/{page}/",
           response_model=SubmissionsFolder, response_class=ORJSONResponse, responses=responses,
           tags=["users", "submissions"])
-async def get_scraps(username: str, page: int, body: Body = None):
+async def get_scraps(username: str, page: int, body: Body):
     """
     Get a list of submissions from the user's scraps folder.
     """
-    r, n = (api := faapi.FAAPI(body.cookies_list() if body else None)).scraps(username.replace("_", ""), page)
+    body.cookies_check()
+    r, n = (api := faapi.FAAPI(body.cookies_list())).scraps(username.replace("_", ""), page)
     await sleep(api.crawl_delay)
     return {"results": r, "next": n or None}
 
@@ -160,21 +167,23 @@ async def get_scraps(username: str, page: int, body: Body = None):
 @app.post("/favorites/{username}/{page}/",
           response_model=SubmissionsFolder, response_class=ORJSONResponse, responses=responses,
           tags=["users", "submissions"])
-async def get_favorites(username: str, page: str, body: Body = None):
+async def get_favorites(username: str, page: str, body: Body):
     """
     Get a list of submissions from the user's favorites folder.
     """
-    r, n = (api := faapi.FAAPI(body.cookies_list() if body else None)).favorites(username.replace("_", ""), page)
+    body.cookies_check()
+    r, n = (api := faapi.FAAPI(body.cookies_list())).favorites(username.replace("_", ""), page)
     await sleep(api.crawl_delay)
     return {"results": r, "next": n or None}
 
 
 @app.post("/journals/{username}/{page}/",
           response_model=JournalsFolder, response_class=ORJSONResponse, responses=responses, tags=["users", "journals"])
-async def get_scraps(username: str, page: int, body: Body = None):
+async def get_scraps(username: str, page: int, body: Body):
     """
     Get a list of journals from the user's journals folder.
     """
-    r, n = (api := faapi.FAAPI(body.cookies_list() if body else None)).journals(username.replace("_", ""), page)
+    body.cookies_check()
+    r, n = (api := faapi.FAAPI(body.cookies_list())).journals(username.replace("_", ""), page)
     await sleep(api.crawl_delay)
     return {"results": r, "next": n or None}
