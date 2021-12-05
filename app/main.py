@@ -138,7 +138,7 @@ async def get_user_whatchlist_by(username: str, page: int, body: Body):
     return {"results": r, "next": n or None}
 
 
-@app.post("/gallery/{username}/{page}/",
+@app.post("/user/{username}/gallery/{page}/",
           response_model=SubmissionsFolder, response_class=ORJSONResponse, responses=responses,
           tags=["users", "submissions"])
 async def get_gallery(username: str, page: int, body: Body):
@@ -151,7 +151,7 @@ async def get_gallery(username: str, page: int, body: Body):
     return {"results": r, "next": n or None}
 
 
-@app.post("/scraps/{username}/{page}/",
+@app.post("/user/{username}/scraps/{page}/",
           response_model=SubmissionsFolder, response_class=ORJSONResponse, responses=responses,
           tags=["users", "submissions"])
 async def get_scraps(username: str, page: int, body: Body):
@@ -164,7 +164,7 @@ async def get_scraps(username: str, page: int, body: Body):
     return {"results": r, "next": n or None}
 
 
-@app.post("/favorites/{username}/{page}/",
+@app.post("/user/{username}/favorites/{page}/",
           response_model=SubmissionsFolder, response_class=ORJSONResponse, responses=responses,
           tags=["users", "submissions"])
 async def get_favorites(username: str, page: str, body: Body):
@@ -177,7 +177,7 @@ async def get_favorites(username: str, page: str, body: Body):
     return {"results": r, "next": n or None}
 
 
-@app.post("/journals/{username}/{page}/",
+@app.post("/user/{username}/journals/{page}/",
           response_model=JournalsFolder, response_class=ORJSONResponse, responses=responses, tags=["users", "journals"])
 async def get_scraps(username: str, page: int, body: Body):
     """
