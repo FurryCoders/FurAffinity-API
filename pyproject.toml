@@ -10,6 +10,7 @@ faapi = "^3.0.1"
 fastapi = "^0.70.0"
 orjson = "^3.6.4"
 uvicorn = "^0.15.0"
+newrelic = "^7.2.4"
 
 [tool.poetry.dev-dependencies]
 
