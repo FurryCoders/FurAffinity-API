@@ -26,7 +26,7 @@ class Body(BaseModel):
     """
     Request body with authentication fields
     """
-    cookies: list[Cookie] = Field([], description="A list of cookies to use to authenticate the request")
+    cookies: list[Cookie] = Field(description="A list of cookies to use to authenticate the request")
 
     def cookies_list(self) -> list[dict[str, str]]:
         return [c.to_dict() for c in self.cookies]
@@ -40,6 +40,7 @@ class Error(BaseModel):
     """
     Error response
     """
+    error: str = Field(description="The name of the error")
     details: Any = Field(description="details of the error")
 
 
