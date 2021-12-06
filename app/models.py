@@ -31,7 +31,7 @@ class Body(BaseModel):
     def cookies_list(self) -> list[dict[str, str]]:
         return [c.to_dict() for c in self.cookies]
 
-    def cookies_check(self):
+    def raise_for_unauthorized(self) -> None:
         if not self.cookies:
             raise Unauthorized(status.HTTP_401_UNAUTHORIZED, "Missing cookies")
 

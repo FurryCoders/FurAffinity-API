@@ -81,7 +81,7 @@ async def get_submission(submission_id: int, body: Body):
     """
     Get a submission
     """
-    body.cookies_check()
+    body.raise_for_unauthorized()
     results = (api := faapi.FAAPI(body.cookies_list())).submission(submission_id)[0]
     await sleep(api.crawl_delay)
     return results
@@ -93,7 +93,7 @@ async def get_journal(journal_id: int, body: Body):
     """
     Get a journal
     """
-    body.cookies_check()
+    body.raise_for_unauthorized()
     results = (api := faapi.FAAPI(body.cookies_list())).journal(journal_id)
     await sleep(api.crawl_delay)
     return results
@@ -104,7 +104,7 @@ async def get_user(username: str, body: Body):
     """
     Get a user's details, profile text, etc. The username may contain underscore (_) characters
     """
-    body.cookies_check()
+    body.raise_for_unauthorized()
     results = (api := faapi.FAAPI(body.cookies_list())).user(username.replace("_", ""))
     await sleep(api.crawl_delay)
     return results
@@ -116,7 +116,7 @@ async def get_user_watchlist_by(username: str, page: int, body: Body):
     """
     Get a list of users watched by {username}
     """
-    body.cookies_check()
+    body.raise_for_unauthorized()
     r, n = (api := faapi.FAAPI(body.cookies_list())).watchlist_by(username.replace("_", ""), page)
     await sleep(api.crawl_delay)
     return {"results": r, "next": n or None}
@@ -128,7 +128,7 @@ async def get_user_watchlist_to(username: str, page: int, body: Body):
     """
     Get a list of users watching {username}
     """
-    body.cookies_check()
+    body.raise_for_unauthorized()
     r, n = (api := faapi.FAAPI(body.cookies_list())).watchlist_to(username.replace("_", ""), page)
     await sleep(api.crawl_delay)
     return {"results": r, "next": n or None}
@@ -141,7 +141,7 @@ async def get_gallery(username: str, page: int, body: Body):
     """
     Get a list of submissions from the user's gallery folder.
     """
-    body.cookies_check()
+    body.raise_for_unauthorized()
     r, n = (api := faapi.FAAPI(body.cookies_list())).gallery(username.replace("_", ""), page)
     await sleep(api.crawl_delay)
     return {"results": r, "next": n or None}
@@ -154,7 +154,7 @@ async def get_scraps(username: str, page: int, body: Body):
     """
     Get a list of submissions from the user's scraps folder.
     """
-    body.cookies_check()
+    body.raise_for_unauthorized()
     r, n = (api := faapi.FAAPI(body.cookies_list())).scraps(username.replace("_", ""), page)
     await sleep(api.crawl_delay)
     return {"results": r, "next": n or None}
@@ -167,7 +167,7 @@ async def get_favorites(username: str, page: str, body: Body):
     """
     Get a list of submissions from the user's favorites folder. Starting page should be 0 or '/'.
     """
-    body.cookies_check()
+    body.raise_for_unauthorized()
     r, n = (api := faapi.FAAPI(body.cookies_list())).favorites(username.replace("_", ""), page)
     await sleep(api.crawl_delay)
     return {"results": r, "next": n or None}
@@ -179,7 +179,7 @@ async def get_scraps(username: str, page: int, body: Body):
     """
     Get a list of journals from the user's journals folder.
     """
-    body.cookies_check()
+    body.raise_for_unauthorized()
     r, n = (api := faapi.FAAPI(body.cookies_list())).journals(username.replace("_", ""), page)
     await sleep(api.crawl_delay)
     return {"results": r, "next": n or None}
