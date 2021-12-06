@@ -29,6 +29,7 @@ from .models import serialise_user_partial
 
 robots: dict[str, list[str]] = faapi.connection.get_robots()
 faapi.connection.get_robots = lambda: robots
+faapi.connection.ping = lambda: None
 faapi.FAAPI.handle_delay = lambda *_: None
 faapi.FAAPI.check_path = lambda *_: None
 faapi.Submission.__iter__ = serialise_submission
