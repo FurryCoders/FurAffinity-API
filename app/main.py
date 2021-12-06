@@ -62,17 +62,17 @@ def handle_http_exception(_request: Request, err: HTTPException):
 
 @app.exception_handler(faapi.exceptions.NoticeMessage)
 def handle_notice_message(_request: Request, _err: faapi.exceptions.NoticeMessage):
-    return handle_http_exception(_request, Unauthorized(status.HTTP_401_UNAUTHORIZED))
+    return handle_http_exception(_request, Unauthorized())
 
 
 @app.exception_handler(faapi.exceptions.ServerError)
 def handle_server_error(_request: Request, _err: faapi.exceptions.ServerError):
-    return handle_http_exception(_request, NotFound(status.HTTP_404_NOT_FOUND))
+    return handle_http_exception(_request, NotFound())
 
 
 @app.exception_handler(faapi.exceptions.DisallowedPath)
 def handle_disallowed_path(_request: Request, _err: faapi.exceptions.ServerError):
-    return handle_http_exception(_request, DisallowedPath(status.HTTP_403_FORBIDDEN))
+    return handle_http_exception(_request, DisallowedPath())
 
 
 @app.post("/submission/{submission_id}/",
