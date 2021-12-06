@@ -112,7 +112,7 @@ async def get_user(username: str, body: Body):
 
 @app.post("/user/{username}/watchlist/by/{page}/", response_model=Watchlist, response_class=ORJSONResponse,
           responses=responses, tags=["users"])
-async def get_user_whatchlist_by(username: str, page: int, body: Body):
+async def get_user_watchlist_by(username: str, page: int, body: Body):
     """
     Get a list of users watched by {username}
     """
@@ -124,7 +124,7 @@ async def get_user_whatchlist_by(username: str, page: int, body: Body):
 
 @app.post("/user/{username}/watchlist/to/{page}/", response_model=Watchlist, response_class=ORJSONResponse,
           responses=responses, tags=["users"])
-async def get_user_whatchlist_by(username: str, page: int, body: Body):
+async def get_user_watchlist_to(username: str, page: int, body: Body):
     """
     Get a list of users watching {username}
     """
