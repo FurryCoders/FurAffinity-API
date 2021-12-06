@@ -49,7 +49,8 @@ responses: dict[int, dict[str, Any]] = {
     status.HTTP_404_NOT_FOUND: {"description": "Not Found", "model": Error},
 }
 
-app: FastAPI = FastAPI(title="Fur Affinity API", version=__version__, openapi_tags=tags)
+app: FastAPI = FastAPI(title="Fur Affinity API", server=[{"url": "https://furaffinity-api.herokuapp.com"}],
+                       version=__version__, openapi_tags=tags)
 app.add_route("/", lambda r: RedirectResponse(app.docs_url), ["GET"])
 app.add_route("/robots.txt",
               lambda r: PlainTextResponse("\n\n".join("\n".join(f"{k}: {v}" for v in vs) for k, vs in robots.items())))
