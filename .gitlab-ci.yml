@@ -16,4 +16,4 @@ Documentation:
   before_script:
     - npm install -g rdme
   script:
-    - rdme openapi <(curl 'https://furaffinity-api.herokuapp.com/openapi.json') --key=$READMEIO_API_KEY --id=$READMEIO_APP_ID
+    - rdme openapi <(curl 'https://furaffinity-api.herokuapp.com/openapi.json') --key=$READMEIO_API_KEY --id=$READMEIO_APP_ID --version=$(git describe --tags)
