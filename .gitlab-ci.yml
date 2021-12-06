@@ -18,5 +18,5 @@ Documentation:
   script:
     - VERSION=$(git describe --tags --abbrev=0)
     - echo VERSION=$VERSION
-    - rdme versions:create --version=$VERSION --key=$READMEIO_API_KEY --main=true --isPublic=true --fork=0 || echo
+    - rdme versions:create --version=$VERSION --key=$READMEIO_API_KEY --fork=0 --main=true --isPublic=true --beta=false || echo
     - rdme openapi <(curl 'https://furaffinity-api.herokuapp.com/openapi.json') --key=$READMEIO_API_KEY --id=$READMEIO_APP_ID --version=$VERSION
