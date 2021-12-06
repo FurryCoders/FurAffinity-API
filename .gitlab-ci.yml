@@ -11,6 +11,7 @@ Deployment:
     - dpl --provider=heroku --app=$HEROKU_APP --api-key=$HEROKU_API_KEY
 
 Documentation:
+  image: node:16
   stage: deploy-documentation
   before_script:
     - npm install -g rdme
