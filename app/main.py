@@ -49,7 +49,7 @@ responses: dict[int, dict[str, Any]] = {
 }
 
 app: FastAPI = FastAPI(title="Fur Affinity API", version=__version__, openapi_tags=tags)
-app.add_route("/", lambda r: RedirectResponse("/docs"), ["GET"])
+app.add_route("/", lambda r: RedirectResponse(app.docs_url), ["GET"])
 app.add_route("/robots.txt",
               lambda r: PlainTextResponse("\n\n".join("\n".join(f"{k}: {v}" for v in vs) for k, vs in robots.items())))
 app.add_route("/robots.json", lambda r: ORJSONResponse(robots), ["GET"])
