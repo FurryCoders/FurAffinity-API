@@ -1,6 +1,5 @@
 stages:
   - deploy
-  - deploy-documentation
 
 Deployment:
   image: ruby:2.4
@@ -9,14 +8,3 @@ Deployment:
     - gem install dpl
   script:
     - dpl --provider=heroku --app=$HEROKU_APP --api-key=$HEROKU_API_KEY
-
-Documentation:
-  image: node:16
-  stage: deploy-documentation
-  before_script:
-    - npm install -g rdme
-  script:
-    - VERSION=$(git describe --tags --abbrev=0)
-    - echo VERSION=$VERSION
-    - rdme versions:create --version=$VERSION --key=$READMEIO_API_KEY --fork=0 --main=true --isPublic=true --beta=false || echo
-    - rdme openapi <(curl 'https://furaffinity-api.herokuapp.com/openapi.json') --key=$READMEIO_API_KEY --id=$READMEIO_APP_ID --version=$VERSION
