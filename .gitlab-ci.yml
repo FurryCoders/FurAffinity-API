@@ -4,4 +4,4 @@ stages:
 Deployment:
   stage: deploy
   script:
-    - git push heroku HEAD:main
+    - git push https://git.heroku.com/$HEROKU_APP.git HEAD:main
