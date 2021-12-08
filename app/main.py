@@ -1,5 +1,5 @@
-import os
 from asyncio import sleep
+from os import environ
 from typing import Any
 
 import faapi
@@ -53,7 +53,7 @@ responses: dict[int, dict[str, Any]] = {
 }
 
 Config.set(
-    key=os.environ.get("SCOUT_KEY"),
+    key=environ.get("SCOUT_KEY"),
     name="furaffinity-api",
     monitor=True,
 )
