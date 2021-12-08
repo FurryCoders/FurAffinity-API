@@ -120,7 +120,7 @@ async def authorize_cookies(body: Body):
             return {"added": False, "id": cookies_id}
         avatar: Tag = faapi.FAAPI(body.cookies_list()).get_parsed("login").select_one("img.loggedin_user_avatar")
         if not avatar:
-            raise Unauthorized()
+            raise Unauthorized("Not a login session")
         cursor.execute("select count(ID) from AUTHS")
         if cursor.fetchone() == 10000:
             cursor.execute("select ID from AUTHS order by ADDED limit 1")
