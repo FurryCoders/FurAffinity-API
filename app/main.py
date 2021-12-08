@@ -106,6 +106,13 @@ def handle_disallowed_path(_request: Request, _err: faapi.exceptions.ServerError
 @app.post("/auth/", response_model=Authorization, response_class=ORJSONResponse, responses=responses,
           tags=["authorization"])
 async def authorize_cookies(body: Body):
+    """
+    Manually check cookies for authorization (whether they belong to a logged-in session or not).
+    A unique sha1 ID is created from the given cookies and saved in a database for future confirmation.
+
+    Because of the limited number of rows available in the database, authorization may be checked
+    again after some time.
+    """
     body.raise_for_unauthorized()
     with settings.database.cursor() as cursor:
         cursor.execute("select ID from AUTHS where ID = %s", (cookies_id := body.cookies_id(),))
