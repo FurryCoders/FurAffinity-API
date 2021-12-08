@@ -52,6 +52,16 @@ class Error(BaseModel):
     details: Any = Field(description="details of the error")
 
 
+class Authorization(BaseModel):
+    """
+    Authorization details
+    """
+    exists: bool = Field(description="True if the user was found in the authorizations database or FA")
+    added: bool = Field(description="True if the user was added to the authorization database")
+    id: str = Field(description="The unique ID of the cookies")
+    username: Optional[str] = Field(None, description="The username attached to the cookies login session")
+
+
 class UserStats(BaseModel):
     """
     User statistics
