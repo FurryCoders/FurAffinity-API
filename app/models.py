@@ -12,6 +12,10 @@ from hashlib import sha1
 from .exceptions import Unauthorized
 
 
+class Settings(BaseModel):
+    database: Any = None
+
+
 class Cookie(BaseModel):
     """
     Container for the cookies used to connect to Fur Affinity
