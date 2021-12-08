@@ -117,7 +117,7 @@ async def authorize_cookies(body: Body):
     with settings.database.cursor() as cursor:
         cursor.execute("select ID from AUTHS where ID = %s", (cookies_id := body.cookies_id(),))
         if cursor.fetchone():
-            return {"exists": True, "added": False, "id": cookies_id}
+            return {"added": False, "id": cookies_id}
         avatar: Tag = faapi.FAAPI(body.cookies_list()).get_parsed("login").select_one("img.loggedin_user_avatar")
         if not avatar:
             raise Unauthorized()
@@ -127,7 +127,7 @@ async def authorize_cookies(body: Body):
             cursor.execute("delete from AUTHS where ID = %s", (cursor.fetchone(),))
         cursor.execute("insert into AUTHS (ID, ADDED) values (%s, %s)", (cookies_id, time(),))
         settings.database.commit()
-        return {"exists": True, "added": True, "id": cookies_id, "username": avatar.attrs.get("alt")}
+        return {"added": True, "id": cookies_id, "username": avatar.attrs.get("alt")}
 
 
 @app.post("/submission/{submission_id}/",
