@@ -7,6 +7,7 @@ import faapi
 from fastapi import status
 from pydantic import BaseModel
 from pydantic import Field
+from hashlib import sha1
 
 from .exceptions import Unauthorized
 
@@ -30,6 +31,9 @@ class Body(BaseModel):
 
     def cookies_list(self) -> list[dict[str, str]]:
         return [c.to_dict() for c in self.cookies]
+
+    def cookies_id(self) -> str:
+        return sha1("".join(f"{c.name}={c.value}" for c in self.cookies).encode()).hexdigest()
 
     def raise_for_unauthorized(self) -> None:
         if not self.cookies:
