@@ -1,8 +1,10 @@
 from asyncio import sleep
 from os import environ
+from time import time
 from typing import Any
 
 import faapi
+from bs4.element import Tag
 from fastapi import FastAPI
 from fastapi import Request
 from fastapi import status
@@ -10,6 +12,7 @@ from fastapi.exceptions import HTTPException
 from fastapi.responses import ORJSONResponse
 from fastapi.responses import PlainTextResponse
 from fastapi.responses import RedirectResponse
+from psycopg2 import connect
 from scout_apm.api import Config
 from scout_apm.async_.starlette import ScoutMiddleware
 
@@ -17,10 +20,12 @@ from .__version__ import __version__
 from .exceptions import DisallowedPath
 from .exceptions import NotFound
 from .exceptions import Unauthorized
+from .models import Authorization
 from .models import Body
 from .models import Error
 from .models import Journal
 from .models import JournalsFolder
+from .models import Settings
 from .models import Submission
 from .models import SubmissionsFolder
 from .models import User
@@ -41,6 +46,7 @@ faapi.UserPartial.__iter__ = serialise_user_partial
 faapi.User.__iter__ = serialise_user
 
 tags: list[dict[str, Any]] = [
+    {"name": "authorization", "description": "Authorize cookies"},
     {"name": "submissions", "description": "Get submissions"},
     {"name": "journals", "description": "Get journals"},
     {"name": "users", "description": "Get user information and folders"},
@@ -66,6 +72,16 @@ app.add_route("/robots.txt",
 app.add_route("/robots.json", lambda r: ORJSONResponse(robots), ["GET"])
 app.add_middleware(ScoutMiddleware)
 
+settings: Settings = Settings()
+
+
+@app.on_event("startup")
+def startup():
+    settings.database = connect(environ["DATABASE_URL"], sslmode="require")
+    with settings.database.cursor() as cursor:
+        cursor.execute("create table if not exists AUTHS (ID character(40) primary key, ADDED float)")
+        settings.database.commit()
+
 
 @app.exception_handler(HTTPException)
 def handle_http_exception(_request: Request, err: HTTPException):
@@ -87,13 +103,33 @@ def handle_disallowed_path(_request: Request, _err: faapi.exceptions.ServerError
     return handle_http_exception(_request, DisallowedPath())
 
 
+@app.post("/auth/", response_model=Authorization, response_class=ORJSONResponse, responses=responses,
+          tags=["authorization"])
+async def authorize_cookies(body: Body):
+    body.raise_for_unauthorized()
+    with settings.database.cursor() as cursor:
+        cursor.execute("select ID from AUTHS where ID = %s", (cookies_id := body.cookies_id(),))
+        if cursor.fetchone():
+            return {"exists": True, "added": False, "id": cookies_id}
+        avatar: Tag = faapi.FAAPI(body.cookies_list()).get_parsed("login").select_one("img.loggedin_user_avatar")
+        if not avatar:
+            raise Unauthorized()
+        cursor.execute("select count(ID) from AUTHS")
+        if cursor.fetchone() == 10000:
+            cursor.execute("select ID from AUTHS order by ADDED limit 1")
+            cursor.execute("delete from AUTHS where ID = %s", (cursor.fetchone(),))
+        cursor.execute("insert into AUTHS (ID, ADDED) values (%s, %s)", (cookies_id, time(),))
+        settings.database.commit()
+        return {"exists": True, "added": True, "id": cookies_id, "username": avatar.attrs.get("alt")}
+
+
 @app.post("/submission/{submission_id}/",
           response_model=Submission, response_class=ORJSONResponse, responses=responses, tags=["submissions"])
 async def get_submission(submission_id: int, body: Body):
     """
     Get a submission
     """
-    body.raise_for_unauthorized()
+    await authorize_cookies(body)
     results = (api := faapi.FAAPI(body.cookies_list())).submission(submission_id)[0]
     await sleep(api.crawl_delay)
     return results
@@ -105,7 +141,7 @@ async def get_journal(journal_id: int, body: Body):
     """
     Get a journal
     """
-    body.raise_for_unauthorized()
+    await authorize_cookies(body)
     results = (api := faapi.FAAPI(body.cookies_list())).journal(journal_id)
     await sleep(api.crawl_delay)
     return results
@@ -116,7 +152,7 @@ async def get_user(username: str, body: Body):
     """
     Get a user's details, profile text, etc. The username may contain underscore (_) characters
     """
-    body.raise_for_unauthorized()
+    await authorize_cookies(body)
     results = (api := faapi.FAAPI(body.cookies_list())).user(username.replace("_", ""))
     await sleep(api.crawl_delay)
     return results
@@ -128,7 +164,7 @@ async def get_user_watchlist_by(username: str, page: int, body: Body):
     """
     Get a list of users watched by {username}
     """
-    body.raise_for_unauthorized()
+    await authorize_cookies(body)
     r, n = (api := faapi.FAAPI(body.cookies_list())).watchlist_by(username.replace("_", ""), page)
     await sleep(api.crawl_delay)
     return {"results": r, "next": n or None}
@@ -140,7 +176,7 @@ async def get_user_watchlist_to(username: str, page: int, body: Body):
     """
     Get a list of users watching {username}
     """
-    body.raise_for_unauthorized()
+    await authorize_cookies(body)
     r, n = (api := faapi.FAAPI(body.cookies_list())).watchlist_to(username.replace("_", ""), page)
     await sleep(api.crawl_delay)
     return {"results": r, "next": n or None}
@@ -153,7 +189,7 @@ async def get_gallery(username: str, page: int, body: Body):
     """
     Get a list of submissions from the user's gallery folder.
     """
-    body.raise_for_unauthorized()
+    await authorize_cookies(body)
     r, n = (api := faapi.FAAPI(body.cookies_list())).gallery(username.replace("_", ""), page)
     await sleep(api.crawl_delay)
     return {"results": r, "next": n or None}
@@ -166,7 +202,7 @@ async def get_scraps(username: str, page: int, body: Body):
     """
     Get a list of submissions from the user's scraps folder.
     """
-    body.raise_for_unauthorized()
+    await authorize_cookies(body)
     r, n = (api := faapi.FAAPI(body.cookies_list())).scraps(username.replace("_", ""), page)
     await sleep(api.crawl_delay)
     return {"results": r, "next": n or None}
@@ -179,7 +215,7 @@ async def get_favorites(username: str, page: str, body: Body):
     """
     Get a list of submissions from the user's favorites folder. Starting page should be 0 or '/'.
     """
-    body.raise_for_unauthorized()
+    await authorize_cookies(body)
     r, n = (api := faapi.FAAPI(body.cookies_list())).favorites(username.replace("_", ""), page)
     await sleep(api.crawl_delay)
     return {"results": r, "next": n or None}
@@ -191,7 +227,7 @@ async def get_scraps(username: str, page: int, body: Body):
     """
     Get a list of journals from the user's journals folder.
     """
-    body.raise_for_unauthorized()
+    await authorize_cookies(body)
     r, n = (api := faapi.FAAPI(body.cookies_list())).journals(username.replace("_", ""), page)
     await sleep(api.crawl_delay)
     return {"results": r, "next": n or None}
