@@ -4,4 +4,4 @@ stages:
 Deployment:
   stage: deploy
   script:
-    - git push heroku
+    - git push heroku HEAD:main
