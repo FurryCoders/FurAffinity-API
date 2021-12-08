@@ -41,7 +41,7 @@ class Body(BaseModel):
 
     def raise_for_unauthorized(self) -> None:
         if not self.cookies:
-            raise Unauthorized(status.HTTP_401_UNAUTHORIZED, "Missing cookies")
+            raise Unauthorized("Missing cookies")
 
 
 class Error(BaseModel):
