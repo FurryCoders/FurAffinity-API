@@ -117,7 +117,7 @@ async def deauthorize_cookies(body: Body):
         return {"id": cookies_id, "exists": True, "removed": True}
 
 
-@app.post("/auth/", response_model=Authorization, response_class=ORJSONResponse, responses=responses,
+@app.post("/auth/add/", response_model=Authorization, response_class=ORJSONResponse, responses=responses,
           tags=["authorization"])
 async def authorize_cookies(body: Body):
     """
