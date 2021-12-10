@@ -100,6 +100,23 @@ def handle_disallowed_path(_request: Request, _err: faapi.exceptions.ServerError
     return handle_http_exception(_request, DisallowedPath())
 
 
+@app.post("/auth/remove/", response_model=Authorization, response_class=ORJSONResponse, responses=responses,
+          tags=["authorization"])
+async def deauthorize_cookies(body: Body):
+    """
+    Manually remove a cookie ID from authorisations database.
+    """
+    body.raise_for_unauthorized()
+    with settings.database.cursor() as cursor:
+        cursor.execute("select ID from AUTHS where ID = %s", (cookies_id := body.cookies_id(),))
+        if not cursor.fetchone():
+            return {"id": cookies_id}
+        cursor.execute("delete from AUTHS where ID = %s", (cookies_id,))
+        settings.database.commit()
+        logger.info(f"Deleted auth ID {cookies_id}")
+        return {"id": cookies_id, "exists": True, "removed": True}
+
+
 @app.post("/auth/", response_model=Authorization, response_class=ORJSONResponse, responses=responses,
           tags=["authorization"])
 async def authorize_cookies(body: Body):
@@ -114,12 +131,12 @@ async def authorize_cookies(body: Body):
     with settings.database.cursor() as cursor:
         cursor.execute("select ID from AUTHS where ID = %s", (cookies_id := body.cookies_id(),))
         if cursor.fetchone():
-            return {"added": False, "id": cookies_id}
+            return {"id": cookies_id, "exists": True, "added": False}
         avatar: Tag = faapi.FAAPI(body.cookies_list()).get_parsed("login").select_one("img.loggedin_user_avatar")
         if not avatar:
             raise Unauthorized("Not a login session")
         cursor.execute("select count(ID) from AUTHS")
-        if (tot := cursor.fetchone()) > database_limit:
+        if (tot := cursor.fetchone()[0]) > database_limit:
             cursor.execute("select ID from AUTHS order by ADDED limit %s", (tot - database_limit))
             for delete_id in cursor.fetchall():
                 cursor.execute("delete from AUTHS where ID = %s", (delete_id,))
@@ -127,7 +144,7 @@ async def authorize_cookies(body: Body):
         cursor.execute("insert into AUTHS (ID, ADDED) values (%s, %s)", (cookies_id, time(),))
         logger.info(f"Added auth ID {cookies_id}")
         settings.database.commit()
-        return {"added": True, "id": cookies_id, "username": avatar.attrs.get("alt")}
+        return {"id": cookies_id, "added": True, "username": avatar.attrs.get("alt")}
 
 
 @app.post("/submission/{submission_id}/",

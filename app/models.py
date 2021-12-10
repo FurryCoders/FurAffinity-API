@@ -56,8 +56,10 @@ class Authorization(BaseModel):
     """
     Authorization details
     """
-    added: bool = Field(description="True if the user was added to the authorization database")
     id: str = Field(description="The unique ID of the cookies")
+    exists: bool = Field(False, description="True if the ID was found in the authorizations database")
+    added: bool = Field(False, description="True if the ID was added to the authorizations database")
+    removed: bool = Field(False, description="True if the ID was deleted from the authorizations database")
     username: Optional[str] = Field(None, description="The username attached to the cookies login session")
 
 
