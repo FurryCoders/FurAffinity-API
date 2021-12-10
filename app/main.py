@@ -35,6 +35,8 @@ from .models import serialise_submission
 from .models import serialise_user
 from .models import serialise_user_partial
 
+database_limit: int = int(environ.get("DATABASE_LIMIT", 10000))
+
 logger: Logger = getLogger("uvicorn")
 
 robots: dict[str, list[str]] = faapi.connection.get_robots()
@@ -117,10 +119,11 @@ async def authorize_cookies(body: Body):
         if not avatar:
             raise Unauthorized("Not a login session")
         cursor.execute("select count(ID) from AUTHS")
-        if cursor.fetchone() == 10000:
-            cursor.execute("select ID from AUTHS order by ADDED limit 1")
-            cursor.execute("delete from AUTHS where ID = %s", (delete_id := cursor.fetchone(),))
-            logger.info(f"Deleted ID {delete_id}")
+        if (tot := cursor.fetchone()) > database_limit:
+            cursor.execute("select ID from AUTHS order by ADDED limit %s", (tot - database_limit))
+            for delete_id in cursor.fetchall():
+                cursor.execute("delete from AUTHS where ID = %s", (delete_id,))
+                logger.info(f"Deleted ID {delete_id}")
         cursor.execute("insert into AUTHS (ID, ADDED) values (%s, %s)", (cookies_id, time(),))
         logger.info(f"Added ID {cookies_id}")
         settings.database.commit()
