@@ -2,9 +2,6 @@ stages:
   - deploy
 
 Deployment:
-  image: ruby:2.4
   stage: deploy
-  before_script:
-    - gem install dpl
   script:
-    - dpl --provider=heroku --app=$HEROKU_APP --api-key=$HEROKU_API_KEY
+    - git push https://$(echo -n $HEROKU_USERNAME | sed -e "s/@/%40/g"):$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP.giti HEAD:main
