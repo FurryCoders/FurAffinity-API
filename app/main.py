@@ -15,8 +15,6 @@ from fastapi.responses import ORJSONResponse
 from fastapi.responses import PlainTextResponse
 from fastapi.responses import RedirectResponse
 from psycopg2 import connect
-from scout_apm.api import Config
-from scout_apm.async_.starlette import ScoutMiddleware
 
 from .__version__ import __version__
 from .exceptions import DisallowedPath
@@ -62,19 +60,12 @@ responses: dict[int, dict[str, Any]] = {
     status.HTTP_404_NOT_FOUND: {"description": "Not Found", "model": Error},
 }
 
-Config.set(
-    key=environ.get("SCOUT_KEY"),
-    name="furaffinity-api",
-    monitor=True,
-)
-
 app: FastAPI = FastAPI(title="Fur Affinity API", servers=[{"url": "https://furaffinity-api.herokuapp.com"}],
                        version=__version__, openapi_tags=tags)
 app.add_route("/", lambda r: RedirectResponse(app.docs_url), ["GET"])
 app.add_route("/robots.txt",
               lambda r: PlainTextResponse("\n\n".join("\n".join(f"{k}: {v}" for v in vs) for k, vs in robots.items())))
 app.add_route("/robots.json", lambda r: ORJSONResponse(robots), ["GET"])
-app.add_middleware(ScoutMiddleware)
 
 settings: Settings = Settings()
 
