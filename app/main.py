@@ -148,7 +148,7 @@ async def get_submission(submission_id: int, body: Body):
     return results
 
 
-@app.post("/journal/{journal_id}", response_model=Journal, response_class=ORJSONResponse, responses=responses,
+@app.post("/journal/{journal_id}/", response_model=Journal, response_class=ORJSONResponse, responses=responses,
           tags=["journals"])
 async def get_journal(journal_id: int, body: Body):
     """
