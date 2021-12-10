@@ -1,4 +1,6 @@
 from asyncio import sleep
+from logging import Logger
+from logging import getLogger
 from os import environ
 from time import time
 from typing import Any
@@ -34,6 +36,8 @@ from .models import serialise_journal
 from .models import serialise_submission
 from .models import serialise_user
 from .models import serialise_user_partial
+
+logger: Logger = getLogger("uvicorn")
 
 robots: dict[str, list[str]] = faapi.connection.get_robots()
 faapi.connection.get_robots = lambda: robots
@@ -124,8 +128,10 @@ async def authorize_cookies(body: Body):
         cursor.execute("select count(ID) from AUTHS")
         if cursor.fetchone() == 10000:
             cursor.execute("select ID from AUTHS order by ADDED limit 1")
-            cursor.execute("delete from AUTHS where ID = %s", (cursor.fetchone(),))
+            cursor.execute("delete from AUTHS where ID = %s", (delete_id := cursor.fetchone(),))
+            logger.info(f"Deleted ID {delete_id}")
         cursor.execute("insert into AUTHS (ID, ADDED) values (%s, %s)", (cookies_id, time(),))
+        logger.info(f"Added ID {cookies_id}")
         settings.database.commit()
         return {"added": True, "id": cookies_id, "username": avatar.attrs.get("alt")}
 
