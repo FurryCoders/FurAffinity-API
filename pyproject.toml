@@ -9,7 +9,7 @@ python = "3.10.0"
 faapi = "^3.0.2"
 fastapi = "^0.70.0"
 orjson = "^3.6.4"
-uvicorn = "^0.15.0"
+uvicorn = "^0.16.0"
 scout-apm = "^2.23.3"
 psycopg2-binary = "^2.9.2"
 
