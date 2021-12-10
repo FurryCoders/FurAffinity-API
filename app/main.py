@@ -236,7 +236,7 @@ async def get_favorites(username: str, page: str, body: Body):
 
 @app.post("/user/{username}/journals/{page}/",
           response_model=JournalsFolder, response_class=ORJSONResponse, responses=responses, tags=["users", "journals"])
-async def get_scraps(username: str, page: int, body: Body):
+async def get_journals(username: str, page: int, body: Body):
     """
     Get a list of journals from the user's journals folder.
     """
