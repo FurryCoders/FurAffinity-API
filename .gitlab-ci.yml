@@ -4,4 +4,4 @@ stages:
 Deployment:
   stage: deploy
   script:
-    - git push https://$(echo -n $HEROKU_USERNAME | sed -e "s/@/%40/g"):$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP.giti HEAD:main
+    - git push https://$(echo -n $HEROKU_USERNAME | sed -e "s/@/%40/g"):$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP.git HEAD:main
