@@ -123,9 +123,9 @@ async def authorize_cookies(body: Body):
             cursor.execute("select ID from AUTHS order by ADDED limit %s", (tot - database_limit))
             for delete_id in cursor.fetchall():
                 cursor.execute("delete from AUTHS where ID = %s", (delete_id,))
-                logger.info(f"Deleted ID {delete_id}")
+                logger.info(f"Deleted auth ID {delete_id}")
         cursor.execute("insert into AUTHS (ID, ADDED) values (%s, %s)", (cookies_id, time(),))
-        logger.info(f"Added ID {cookies_id}")
+        logger.info(f"Added auth ID {cookies_id}")
         settings.database.commit()
         return {"added": True, "id": cookies_id, "username": avatar.attrs.get("alt")}
 
