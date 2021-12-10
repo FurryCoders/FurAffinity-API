@@ -142,6 +142,18 @@ async def get_submission(submission_id: int, body: Body):
     return results
 
 
+@app.post("/submission/{submission_id}/file",
+          response_class=RedirectResponse, status_code=302, responses=responses, tags=["submissions"])
+async def get_submission_file(submission_id: int, body: Body):
+    """
+    Redirect to a submission's file URL
+    """
+    await authorize_cookies(body)
+    results = (api := faapi.FAAPI(body.cookies_list())).submission(submission_id)[0]
+    await sleep(api.crawl_delay)
+    return RedirectResponse(results.file_url, 302)
+
+
 @app.post("/journal/{journal_id}/", response_model=Journal, response_class=ORJSONResponse, responses=responses,
           tags=["journals"])
 async def get_journal(journal_id: int, body: Body):
