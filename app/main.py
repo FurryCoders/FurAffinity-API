@@ -15,6 +15,7 @@ from fastapi.responses import ORJSONResponse
 from fastapi.responses import PlainTextResponse
 from fastapi.responses import RedirectResponse
 from psycopg2 import connect
+from uvicorn.config import LOGGING_CONFIG
 
 from .__version__ import __version__
 from .exceptions import DisallowedPath
@@ -38,6 +39,8 @@ from .models import serialise_user_partial
 database_limit: int = int(environ.get("DATABASE_LIMIT", 10000))
 
 logger: Logger = getLogger("uvicorn")
+LOGGING_CONFIG["formatters"]["access"]["fmt"] = \
+    '%(levelprefix)s %(asctime)s %(client_addr)s - %(request_line)s %(status_code)s %(msecs).0fms'
 
 robots: dict[str, list[str]] = faapi.connection.get_robots()
 faapi.connection.get_robots = lambda: robots
