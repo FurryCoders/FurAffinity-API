@@ -11,6 +11,7 @@ from fastapi import Request
 from fastapi import status
 from fastapi.exceptions import HTTPException
 from fastapi.responses import ORJSONResponse
+from fastapi.responses import PlainTextResponse
 from fastapi.responses import RedirectResponse
 from psycopg2 import connect
 from uvicorn.config import LOGGING_CONFIG
@@ -64,8 +65,10 @@ responses: dict[int, dict[str, Any]] = {
 description: str = "\n".join((Path(__file__).parent.parent / "README.md").read_text().splitlines()[1:])
 
 app: FastAPI = FastAPI(title="Fur Affinity API", servers=[{"url": "https://furaffinity-api.herokuapp.com"}],
-                       version=__version__, openapi_tags=tags, description=description, license_info={""})
+                       version=__version__, openapi_tags=tags, description=description,
+                       license_info={"name": "European Union Public Licence v. 1.2", "url": "https://eupl.eu/1.2/en"})
 app.add_route("/", lambda r: RedirectResponse(app.docs_url), ["GET"])
+app.add_route("/license", lambda r: RedirectResponse(app.license_info["url"]), ["GET"])
 app.add_route("/robots.json", lambda r: ORJSONResponse(robots), ["GET"])
 
 settings: Settings = Settings()
