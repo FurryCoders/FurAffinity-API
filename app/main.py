@@ -6,7 +6,6 @@ from time import time
 from typing import Any
 
 import faapi
-from bs4.element import Tag
 from fastapi import FastAPI
 from fastapi import Request
 from fastapi import status
@@ -135,8 +134,7 @@ async def authorize_cookies(body: Body):
         cursor.execute("select ID from AUTHS where ID = %s", (cookies_id := body.cookies_id(),))
         if cursor.fetchone():
             return {"id": cookies_id, "exists": True, "added": False}
-        avatar: Tag = faapi.FAAPI(body.cookies_list()).get_parsed("login").select_one("img.loggedin_user_avatar")
-        if not avatar:
+        if not faapi.FAAPI(body.cookies_list()).login_status:
             raise Unauthorized("Not a login session")
         cursor.execute("select count(ID) from AUTHS")
         if (tot := cursor.fetchone()[0]) > database_limit:
@@ -147,7 +145,7 @@ async def authorize_cookies(body: Body):
         cursor.execute("insert into AUTHS (ID, ADDED) values (%s, %s)", (cookies_id, time(),))
         logger.info(f"Added auth ID {cookies_id}")
         settings.database.commit()
-        return {"id": cookies_id, "added": True, "username": avatar.attrs.get("alt")}
+        return {"id": cookies_id, "added": True}
 
 
 @app.post("/submission/{submission_id}/",
