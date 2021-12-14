@@ -10,7 +10,6 @@ from fastapi import Request
 from fastapi import status
 from fastapi.exceptions import HTTPException
 from fastapi.responses import ORJSONResponse
-from fastapi.responses import PlainTextResponse
 from fastapi.responses import RedirectResponse
 from psycopg2 import connect
 from uvicorn.config import LOGGING_CONFIG
@@ -69,8 +68,6 @@ description: str = """
 app: FastAPI = FastAPI(title="Fur Affinity API", servers=[{"url": "https://furaffinity-api.herokuapp.com"}],
                        version=__version__, openapi_tags=tags, description=description)
 app.add_route("/", lambda r: RedirectResponse(app.docs_url), ["GET"])
-app.add_route("/robots.txt",
-              lambda r: PlainTextResponse("\n\n".join("\n".join(f"{k}: {v}" for v in vs) for k, vs in robots.items())))
 app.add_route("/robots.json", lambda r: ORJSONResponse(robots), ["GET"])
 
 settings: Settings = Settings()
