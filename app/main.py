@@ -1,6 +1,7 @@
 from logging import Logger
 from logging import getLogger
 from os import environ
+from pathlib import Path
 from time import time
 from typing import Any
 
@@ -60,10 +61,7 @@ responses: dict[int, dict[str, Any]] = {
     status.HTTP_404_NOT_FOUND: {"description": "Not Found", "model": Error},
 }
 
-description: str = """
-[![](https://img.shields.io/gitlab/v/tag/MatteoCampinoti94/furaffinity-api?label=version&sort=date)](https://gitlab.com/MatteoCampinoti94/furaffinity-api)
-[![](https://gitlab.com/MatteoCampinoti94/furaffinity-api/badges/main/pipeline.svg)](https://gitlab.com/MatteoCampinoti94/furaffinity-api)
-"""
+description: str = "\n".join((Path(__file__).parent.parent / "README.md").read_text().splitlines()[1:])
 
 app: FastAPI = FastAPI(title="Fur Affinity API", servers=[{"url": "https://furaffinity-api.herokuapp.com"}],
                        version=__version__, openapi_tags=tags, description=description)
