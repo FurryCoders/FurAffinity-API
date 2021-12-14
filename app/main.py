@@ -64,7 +64,7 @@ responses: dict[int, dict[str, Any]] = {
 description: str = "\n".join((Path(__file__).parent.parent / "README.md").read_text().splitlines()[1:])
 
 app: FastAPI = FastAPI(title="Fur Affinity API", servers=[{"url": "https://furaffinity-api.herokuapp.com"}],
-                       version=__version__, openapi_tags=tags, description=description)
+                       version=__version__, openapi_tags=tags, description=description, license_info={""})
 app.add_route("/", lambda r: RedirectResponse(app.docs_url), ["GET"])
 app.add_route("/robots.json", lambda r: ORJSONResponse(robots), ["GET"])
 
