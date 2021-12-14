@@ -1,4 +1,3 @@
-from asyncio import sleep
 from logging import Logger
 from logging import getLogger
 from os import environ
@@ -43,7 +42,6 @@ LOGGING_CONFIG["formatters"]["access"]["fmt"] = \
 
 robots: dict[str, list[str]] = faapi.connection.get_robots()
 faapi.connection.get_robots = lambda: robots
-faapi.FAAPI.handle_delay = lambda *_: None
 faapi.FAAPI.check_path = lambda *_: None
 faapi.Submission.__iter__ = serialise_submission
 faapi.Journal.__iter__ = serialise_journal
@@ -134,7 +132,7 @@ async def authorize_cookies(body: Body):
         cursor.execute("select ID from AUTHS where ID = %s", (cookies_id := body.cookies_id(),))
         if cursor.fetchone():
             return {"id": cookies_id, "exists": True, "added": False}
-        if not faapi.FAAPI(body.cookies_list()).login_status:
+        if not (api := faapi.FAAPI(body.cookies_list())).login_status:
             raise Unauthorized("Not a login session")
         cursor.execute("select count(ID) from AUTHS")
         if (tot := cursor.fetchone()[0]) > database_limit:
@@ -145,6 +143,7 @@ async def authorize_cookies(body: Body):
         cursor.execute("insert into AUTHS (ID, ADDED) values (%s, %s)", (cookies_id, time(),))
         logger.info(f"Added auth ID {cookies_id}")
         settings.database.commit()
+        api.handle_delay()
         return {"id": cookies_id, "added": True}
 
 
@@ -156,7 +155,7 @@ async def get_submission(submission_id: int, body: Body):
     """
     await authorize_cookies(body)
     results = (api := faapi.FAAPI(body.cookies_list())).submission(submission_id)[0]
-    await sleep(api.crawl_delay)
+    api.handle_delay()
     return results
 
 
@@ -168,7 +167,7 @@ async def get_submission_file(submission_id: int, body: Body):
     """
     await authorize_cookies(body)
     results = (api := faapi.FAAPI(body.cookies_list())).submission(submission_id)[0]
-    await sleep(api.crawl_delay)
+    api.handle_delay()
     return RedirectResponse(results.file_url, 302)
 
 
@@ -180,7 +179,7 @@ async def get_journal(journal_id: int, body: Body):
     """
     await authorize_cookies(body)
     results = (api := faapi.FAAPI(body.cookies_list())).journal(journal_id)
-    await sleep(api.crawl_delay)
+    api.handle_delay()
     return results
 
 
@@ -191,7 +190,7 @@ async def get_user(body: Body):
     """
     await authorize_cookies(body)
     results = (api := faapi.FAAPI(body.cookies_list())).me()
-    await sleep(api.crawl_delay)
+    api.handle_delay()
     return results
 
 
@@ -202,7 +201,7 @@ async def get_user(username: str, body: Body):
     """
     await authorize_cookies(body)
     results = (api := faapi.FAAPI(body.cookies_list())).user(username.replace("_", ""))
-    await sleep(api.crawl_delay)
+    api.handle_delay()
     return results
 
 
@@ -214,7 +213,7 @@ async def get_user_watchlist_by(username: str, page: int, body: Body):
     """
     await authorize_cookies(body)
     r, n = (api := faapi.FAAPI(body.cookies_list())).watchlist_by(username.replace("_", ""), page)
-    await sleep(api.crawl_delay)
+    api.handle_delay()
     return {"results": r, "next": n or None}
 
 
@@ -226,7 +225,7 @@ async def get_user_watchlist_to(username: str, page: int, body: Body):
     """
     await authorize_cookies(body)
     r, n = (api := faapi.FAAPI(body.cookies_list())).watchlist_to(username.replace("_", ""), page)
-    await sleep(api.crawl_delay)
+    api.handle_delay()
     return {"results": r, "next": n or None}
 
 
@@ -239,7 +238,7 @@ async def get_gallery(username: str, page: int, body: Body):
     """
     await authorize_cookies(body)
     r, n = (api := faapi.FAAPI(body.cookies_list())).gallery(username.replace("_", ""), page)
-    await sleep(api.crawl_delay)
+    api.handle_delay()
     return {"results": r, "next": n or None}
 
 
@@ -252,7 +251,7 @@ async def get_scraps(username: str, page: int, body: Body):
     """
     await authorize_cookies(body)
     r, n = (api := faapi.FAAPI(body.cookies_list())).scraps(username.replace("_", ""), page)
-    await sleep(api.crawl_delay)
+    api.handle_delay()
     return {"results": r, "next": n or None}
 
 
@@ -265,7 +264,7 @@ async def get_favorites(username: str, page: str, body: Body):
     """
     await authorize_cookies(body)
     r, n = (api := faapi.FAAPI(body.cookies_list())).favorites(username.replace("_", ""), page)
-    await sleep(api.crawl_delay)
+    api.handle_delay()
     return {"results": r, "next": n or None}
 
 
@@ -277,5 +276,5 @@ async def get_journals(username: str, page: int, body: Body):
     """
     await authorize_cookies(body)
     r, n = (api := faapi.FAAPI(body.cookies_list())).journals(username.replace("_", ""), page)
-    await sleep(api.crawl_delay)
+    api.handle_delay()
     return {"results": r, "next": n or None}
