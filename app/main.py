@@ -11,7 +11,6 @@ from fastapi import Request
 from fastapi import status
 from fastapi.exceptions import HTTPException
 from fastapi.responses import ORJSONResponse
-from fastapi.responses import PlainTextResponse
 from fastapi.responses import RedirectResponse
 from psycopg2 import connect
 from uvicorn.config import LOGGING_CONFIG
