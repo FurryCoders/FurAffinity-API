@@ -170,7 +170,7 @@ async def get_submission_file(submission_id: int, body: Body):
     await authorize_cookies(body)
     results = (api := faapi.FAAPI(body.cookies_list())).submission(submission_id)[0]
     api.handle_delay()
-    return RedirectResponse(results.file_url, 302)
+    return RedirectResponse(results.file_url, status.HTTP_303_SEE_OTHER)
 
 
 @app.post("/journal/{journal_id}/", response_model=Journal, response_class=ORJSONResponse, responses=responses,
