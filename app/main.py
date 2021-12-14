@@ -61,8 +61,13 @@ responses: dict[int, dict[str, Any]] = {
     status.HTTP_404_NOT_FOUND: {"description": "Not Found", "model": Error},
 }
 
+description: str = """
+[![](https://img.shields.io/gitlab/v/tag/MatteoCampinoti94/furaffinity-api?label=version&sort=date)](https://gitlab.com/MatteoCampinoti94/furaffinity-api)
+[![](https://img.shields.io/gitlab/pipeline-status/MatteoCampinoti94/furaffinity-api?branch=main)](https://gitlab.com/MatteoCampinoti94/furaffinity-api/-/pipelines)
+"""
+
 app: FastAPI = FastAPI(title="Fur Affinity API", servers=[{"url": "https://furaffinity-api.herokuapp.com"}],
-                       version=__version__, openapi_tags=tags)
+                       version=__version__, openapi_tags=tags, description=description)
 app.add_route("/", lambda r: RedirectResponse(app.docs_url), ["GET"])
 app.add_route("/robots.txt",
               lambda r: PlainTextResponse("\n\n".join("\n".join(f"{k}: {v}" for v in vs) for k, vs in robots.items())))
