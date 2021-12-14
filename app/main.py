@@ -186,7 +186,7 @@ async def get_journal(journal_id: int, body: Body):
 
 
 @app.post("/me/", response_model=User, response_class=ORJSONResponse, responses=responses, tags=["users"])
-async def get_user(body: Body):
+async def get_login_user(body: Body):
     """
     Get the logged-in user's details, profile text, etc. The username may contain underscore (_) characters
     """
