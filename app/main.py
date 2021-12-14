@@ -76,6 +76,7 @@ settings: Settings = Settings()
 
 @app.on_event("startup")
 def startup():
+    logger.info(f"Using faapi {faapi.__version__}")
     settings.database = connect(environ["DATABASE_URL"], sslmode="require")
     with settings.database.cursor() as cursor:
         cursor.execute("create table if not exists AUTHS (ID character(40) primary key, ADDED float)")
