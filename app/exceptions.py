@@ -11,12 +11,12 @@ class NotFound(HTTPException):
 
 
 class DisallowedPath(HTTPException):
-    def __init__(self, detail: Any = None, status_code: int = status.HTTP_401_UNAUTHORIZED,
+    def __init__(self, detail: Any = None, status_code: int = status.HTTP_403_FORBIDDEN,
                  headers: dict[str, Any] = None):
         super(DisallowedPath, self).__init__(status_code, detail, headers)
 
 
 class Unauthorized(HTTPException):
-    def __init__(self, detail: Any = None, status_code: int = status.HTTP_403_FORBIDDEN,
+    def __init__(self, detail: Any = None, status_code: int = status.HTTP_401_UNAUTHORIZED,
                  headers: dict[str, Any] = None):
         super(Unauthorized, self).__init__(status_code, detail, headers)
