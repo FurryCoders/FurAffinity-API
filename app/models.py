@@ -169,7 +169,7 @@ class Watchlist(BaseModel):
     next: Optional[int] = Field(description="Number of the next page, null if last page")
 
 
-def serialise_journal(jrn: faapi.Journal):
+def iter_journal(jrn: faapi.Journal):
     yield "id", jrn.id
     yield "title", jrn.title
     yield "date", jrn.date
@@ -178,7 +178,7 @@ def serialise_journal(jrn: faapi.Journal):
     yield "mentions", jrn.mentions
 
 
-def serialise_submission(sub: faapi.Submission):
+def iter_submission(sub: faapi.Submission):
     yield "id", sub.id
     yield "title", sub.title
     yield "author", sub.author
@@ -196,7 +196,7 @@ def serialise_submission(sub: faapi.Submission):
     yield "thumbnail_url", sub.thumbnail_url
 
 
-def serialise_user(usr: faapi.User):
+def iter_user(usr: faapi.User):
     yield "name", usr.name
     yield "status", usr.status
     yield "title", usr.title
@@ -209,7 +209,7 @@ def serialise_user(usr: faapi.User):
     yield "user_icon_url", usr.user_icon_url
 
 
-def serialise_user_partial(usr: faapi.UserPartial):
+def iter_user_partial(usr: faapi.UserPartial):
     yield "name", usr.name
     yield "status", usr.status if usr.status else None
     yield "title", usr.title

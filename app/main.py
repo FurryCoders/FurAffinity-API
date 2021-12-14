@@ -29,10 +29,10 @@ from .models import Submission
 from .models import SubmissionsFolder
 from .models import User
 from .models import Watchlist
-from .models import serialise_journal
-from .models import serialise_submission
-from .models import serialise_user
-from .models import serialise_user_partial
+from .models import iter_journal
+from .models import iter_submission
+from .models import iter_user
+from .models import iter_user_partial
 
 database_limit: int = int(environ.get("DATABASE_LIMIT", 10000))
 
@@ -43,10 +43,10 @@ LOGGING_CONFIG["formatters"]["access"]["fmt"] = \
 robots: dict[str, list[str]] = faapi.connection.get_robots()
 faapi.connection.get_robots = lambda: robots
 faapi.FAAPI.check_path = lambda *_: None
-faapi.Submission.__iter__ = serialise_submission
-faapi.Journal.__iter__ = serialise_journal
-faapi.UserPartial.__iter__ = serialise_user_partial
-faapi.User.__iter__ = serialise_user
+faapi.Submission.__iter__ = iter_submission
+faapi.Journal.__iter__ = iter_journal
+faapi.UserPartial.__iter__ = iter_user_partial
+faapi.User.__iter__ = iter_user
 
 tags: list[dict[str, Any]] = [
     {"name": "authorization", "description": "Authorize cookies"},
