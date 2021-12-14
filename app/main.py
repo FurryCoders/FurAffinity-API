@@ -184,6 +184,17 @@ async def get_journal(journal_id: int, body: Body):
     return results
 
 
+@app.post("/me/", response_model=User, response_class=ORJSONResponse, responses=responses, tags=["users"])
+async def get_user(body: Body):
+    """
+    Get the logged-in user's details, profile text, etc. The username may contain underscore (_) characters
+    """
+    await authorize_cookies(body)
+    results = (api := faapi.FAAPI(body.cookies_list())).me()
+    await sleep(api.crawl_delay)
+    return results
+
+
 @app.post("/user/{username}/", response_model=User, response_class=ORJSONResponse, responses=responses, tags=["users"])
 async def get_user(username: str, body: Body):
     """
