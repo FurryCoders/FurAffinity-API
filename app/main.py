@@ -161,7 +161,7 @@ async def get_submission(submission_id: int, body: Body):
     return results
 
 
-@app.post("/submission/{submission_id}/file",
+@app.post("/submission/{submission_id}/file/",
           response_class=RedirectResponse, status_code=302, responses=responses, tags=["submissions"])
 async def get_submission_file(submission_id: int, body: Body):
     """
