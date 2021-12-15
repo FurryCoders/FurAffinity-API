@@ -12,6 +12,7 @@ from fastapi import status
 from fastapi.exceptions import HTTPException
 from fastapi.responses import ORJSONResponse
 from fastapi.responses import RedirectResponse
+from fastapi.staticfiles import StaticFiles
 from psycopg2 import connect
 from uvicorn.config import LOGGING_CONFIG
 
@@ -69,6 +70,7 @@ app: FastAPI = FastAPI(title="Fur Affinity API", servers=[{"url": "https://furaf
 app.add_route("/", lambda r: RedirectResponse(app.docs_url), ["GET"])
 app.add_route("/license", lambda r: RedirectResponse(app.license_info["url"]), ["GET"])
 app.add_route("/robots.json", lambda r: ORJSONResponse(robots), ["GET"])
+app.mount("/static", StaticFiles(directory=Path(__file__).parent.parent / "static"), "static")
 
 settings: Settings = Settings()
 
