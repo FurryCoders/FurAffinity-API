@@ -106,6 +106,19 @@ def handle_disallowed_path(_request: Request, _err: faapi.exceptions.ServerError
     return handle_http_exception(_request, DisallowedPath())
 
 
+@app.get("/favicon.ico", response_class=RedirectResponse, include_in_schema=False)
+async def serve_favicon():
+    return RedirectResponse("/static/favicon.ico", 301)
+
+
+@app.get("/icon.png", response_class=RedirectResponse, include_in_schema=False)
+@app.get("/touch-icon.png", response_class=RedirectResponse, include_in_schema=False)
+@app.get("/apple-touch-icon.png", response_class=RedirectResponse, include_in_schema=False)
+@app.get("/apple-touch-icon-precomposed.png", response_class=RedirectResponse, include_in_schema=False)
+async def serve_touch_icon():
+    return RedirectResponse("/static/logo.png", 301)
+
+
 @app.post("/auth/remove/", response_model=Authorization, response_class=ORJSONResponse, responses=responses,
           tags=["authorization"])
 async def deauthorize_cookies(body: Body):
