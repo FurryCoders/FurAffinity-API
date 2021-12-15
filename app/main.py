@@ -77,6 +77,8 @@ settings: Settings = Settings()
 
 @app.on_event("startup")
 def startup():
+    app.openapi()
+    app.openapi_schema["info"]["x-logo"] = {"url": "/static/logo.png"}
     logger.info(f"Using faapi {faapi.__version__}")
     settings.database = connect(environ["DATABASE_URL"], sslmode="require")
     with settings.database.cursor() as cursor:
