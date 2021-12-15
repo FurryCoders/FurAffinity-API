@@ -10,6 +10,8 @@ from fastapi import FastAPI
 from fastapi import Request
 from fastapi import status
 from fastapi.exceptions import HTTPException
+from fastapi.openapi.docs import get_redoc_html
+from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.responses import ORJSONResponse
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -66,8 +68,13 @@ description: str = "\n".join((Path(__file__).parent.parent / "README.md").read_t
 
 app: FastAPI = FastAPI(title="Fur Affinity API", servers=[{"url": "https://furaffinity-api.herokuapp.com"}],
                        version=__version__, openapi_tags=tags, description=description,
-                       license_info={"name": "European Union Public Licence v. 1.2", "url": "https://eupl.eu/1.2/en"})
-app.add_route("/", lambda r: RedirectResponse(app.docs_url), ["GET"])
+                       license_info={"name": "European Union Public Licence v. 1.2", "url": "https://eupl.eu/1.2/en"},
+                       docs_url=None, redoc_url=None)
+app.add_route("/docs", lambda r: get_swagger_ui_html(openapi_url="/openapi.json", title=app.title + " - Swagger UI",
+                                                     swagger_favicon_url="/favicon.ico"), ["GET"])
+app.add_route("/redoc", lambda r: get_redoc_html(openapi_url="/openapi.json", title=app.title + " - ReDoc",
+                                                 redoc_favicon_url="/favicon.ico"), ["GET"])
+app.add_route("/", lambda r: RedirectResponse("/docs"), ["GET"])
 app.add_route("/license", lambda r: RedirectResponse(app.license_info["url"]), ["GET"])
 app.add_route("/robots.json", lambda r: ORJSONResponse(robots), ["GET"])
 app.mount("/static", StaticFiles(directory=Path(__file__).parent.parent / "static"), "static")
