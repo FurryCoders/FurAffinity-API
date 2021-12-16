@@ -51,11 +51,16 @@ faapi.Journal.__iter__ = iter_journal
 faapi.UserPartial.__iter__ = iter_user_partial
 faapi.User.__iter__ = iter_user
 
+tag_auth: str = "Authorization"
+tag_subs: str = "Submissions"
+tag_jrns: str = "Journals"
+tag_usrs: str = "User"
+
 tags: list[dict[str, Any]] = [
-    {"name": "authorization", "description": "Authorize cookies"},
-    {"name": "submissions", "description": "Get submissions"},
-    {"name": "journals", "description": "Get journals"},
-    {"name": "users", "description": "Get user information and folders"},
+    {"name": tag_auth, "description": "Authorize cookies"},
+    {"name": tag_subs, "description": "Get submissions"},
+    {"name": tag_jrns, "description": "Get journals"},
+    {"name": tag_usrs, "description": "Get user information and folders"},
 ]
 
 responses: dict[int, dict[str, Any]] = {
@@ -127,7 +132,7 @@ async def serve_touch_icon():
 
 
 @app.post("/auth/remove/", response_model=Authorization, response_class=ORJSONResponse, responses=responses,
-          tags=["authorization"])
+          tags=[tag_auth])
 async def deauthorize_cookies(body: Body):
     """
     Manually remove a cookie ID from authorisations database.
@@ -144,7 +149,7 @@ async def deauthorize_cookies(body: Body):
 
 
 @app.post("/auth/add/", response_model=Authorization, response_class=ORJSONResponse, responses=responses,
-          tags=["authorization"])
+          tags=[tag_auth])
 async def authorize_cookies(body: Body):
     """
     Manually check cookies for authorization (whether they belong to a logged-in session or not).
@@ -174,7 +179,7 @@ async def authorize_cookies(body: Body):
 
 
 @app.post("/submission/{submission_id}/",
-          response_model=Submission, response_class=ORJSONResponse, responses=responses, tags=["submissions"])
+          response_model=Submission, response_class=ORJSONResponse, responses=responses, tags=[tag_subs])
 async def get_submission(submission_id: int, body: Body):
     """
     Get a submission
@@ -186,7 +191,7 @@ async def get_submission(submission_id: int, body: Body):
 
 
 @app.post("/submission/{submission_id}/file/",
-          response_class=RedirectResponse, status_code=302, responses=responses, tags=["submissions"])
+          response_class=RedirectResponse, status_code=302, responses=responses, tags=[tag_subs])
 async def get_submission_file(submission_id: int, body: Body):
     """
     Redirect to a submission's file URL
@@ -198,7 +203,7 @@ async def get_submission_file(submission_id: int, body: Body):
 
 
 @app.post("/journal/{journal_id}/", response_model=Journal, response_class=ORJSONResponse, responses=responses,
-          tags=["journals"])
+          tags=[tag_jrns])
 async def get_journal(journal_id: int, body: Body):
     """
     Get a journal
@@ -209,7 +214,7 @@ async def get_journal(journal_id: int, body: Body):
     return results
 
 
-@app.post("/me/", response_model=User, response_class=ORJSONResponse, responses=responses, tags=["users"])
+@app.post("/me/", response_model=User, response_class=ORJSONResponse, responses=responses, tags=[tag_usrs])
 async def get_login_user(body: Body):
     """
     Get the logged-in user's details, profile text, etc. The username may contain underscore (_) characters
@@ -220,7 +225,7 @@ async def get_login_user(body: Body):
     return results
 
 
-@app.post("/user/{username}/", response_model=User, response_class=ORJSONResponse, responses=responses, tags=["users"])
+@app.post("/user/{username}/", response_model=User, response_class=ORJSONResponse, responses=responses, tags=[tag_usrs])
 async def get_user(username: str, body: Body):
     """
     Get a user's details, profile text, etc. The username may contain underscore (_) characters
@@ -232,7 +237,7 @@ async def get_user(username: str, body: Body):
 
 
 @app.post("/user/{username}/watchlist/by/{page}/", response_model=Watchlist, response_class=ORJSONResponse,
-          responses=responses, tags=["users"])
+          responses=responses, tags=[tag_usrs])
 async def get_user_watchlist_by(username: str, page: int, body: Body):
     """
     Get a list of users watched by {username}
@@ -244,7 +249,7 @@ async def get_user_watchlist_by(username: str, page: int, body: Body):
 
 
 @app.post("/user/{username}/watchlist/to/{page}/", response_model=Watchlist, response_class=ORJSONResponse,
-          responses=responses, tags=["users"])
+          responses=responses, tags=[tag_usrs])
 async def get_user_watchlist_to(username: str, page: int, body: Body):
     """
     Get a list of users watching {username}
@@ -257,7 +262,7 @@ async def get_user_watchlist_to(username: str, page: int, body: Body):
 
 @app.post("/user/{username}/gallery/{page}/",
           response_model=SubmissionsFolder, response_class=ORJSONResponse, responses=responses,
-          tags=["users", "submissions"])
+          tags=[tag_usrs, tag_subs])
 async def get_gallery(username: str, page: int, body: Body):
     """
     Get a list of submissions from the user's gallery folder.
@@ -270,7 +275,7 @@ async def get_gallery(username: str, page: int, body: Body):
 
 @app.post("/user/{username}/scraps/{page}/",
           response_model=SubmissionsFolder, response_class=ORJSONResponse, responses=responses,
-          tags=["users", "submissions"])
+          tags=[tag_usrs, tag_subs])
 async def get_scraps(username: str, page: int, body: Body):
     """
     Get a list of submissions from the user's scraps folder.
@@ -283,7 +288,7 @@ async def get_scraps(username: str, page: int, body: Body):
 
 @app.post("/user/{username}/favorites/{page:path}",
           response_model=SubmissionsFolder, response_class=ORJSONResponse, responses=responses,
-          tags=["users", "submissions"])
+          tags=[tag_usrs, tag_subs])
 async def get_favorites(username: str, page: str, body: Body):
     """
     Get a list of submissions from the user's favorites folder. Starting page should be 0 or '/'.
@@ -295,7 +300,7 @@ async def get_favorites(username: str, page: str, body: Body):
 
 
 @app.post("/user/{username}/journals/{page}/",
-          response_model=JournalsFolder, response_class=ORJSONResponse, responses=responses, tags=["users", "journals"])
+          response_model=JournalsFolder, response_class=ORJSONResponse, responses=responses, tags=[tag_usrs, tag_jrns])
 async def get_journals(username: str, page: int, body: Body):
     """
     Get a list of journals from the user's journals folder.
