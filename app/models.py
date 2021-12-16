@@ -1,13 +1,12 @@
 from datetime import datetime
+from hashlib import sha1
 from typing import Any
 from typing import Optional
 from typing import Union
 
 import faapi
-from fastapi import status
 from pydantic import BaseModel
 from pydantic import Field
-from hashlib import sha1
 
 from .exceptions import Unauthorized
 
