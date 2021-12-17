@@ -21,6 +21,7 @@ from uvicorn.config import LOGGING_CONFIG
 from .__version__ import __version__
 from .exceptions import DisallowedPath
 from .exceptions import NotFound
+from .exceptions import ParsingError
 from .exceptions import Unauthorized
 from .models import Authorization
 from .models import Body
@@ -69,6 +70,7 @@ responses: dict[int, dict[str, Any]] = {
     status.HTTP_401_UNAUTHORIZED: {"description": "Unauthorized", "model": Error},
     status.HTTP_403_FORBIDDEN: {"description": "Forbidden", "model": Error},
     status.HTTP_404_NOT_FOUND: {"description": "Not Found", "model": Error},
+    status.HTTP_500_INTERNAL_SERVER_ERROR: {"description": "Server Error", "model": Error},
 }
 
 description: str = "\n".join((root_folder / "README.md").read_text().splitlines()[1:])
@@ -106,18 +108,25 @@ def handle_http_exception(_request: Request, err: HTTPException):
 
 
 @app.exception_handler(faapi.exceptions.NoticeMessage)
-def handle_notice_message(_request: Request, _err: faapi.exceptions.NoticeMessage):
-    return handle_http_exception(_request, Unauthorized())
+def handle_notice_message(_request: Request, err: faapi.exceptions.NoticeMessage):
+    return handle_http_exception(_request, Unauthorized(err.args[0] if err.args else None))
 
 
 @app.exception_handler(faapi.exceptions.ServerError)
-def handle_server_error(_request: Request, _err: faapi.exceptions.ServerError):
-    return handle_http_exception(_request, NotFound())
+@app.exception_handler(faapi.exceptions.DisabledAccount)
+def handle_server_error(_request: Request, err: faapi.exceptions.ParsingError):
+    return handle_http_exception(_request, NotFound([err.__class__.__name__, *err.args[0:1]]))
+
+
+@app.exception_handler(faapi.exceptions.NoTitle)
+@app.exception_handler(faapi.exceptions.NonePage)
+def handle_parsing_errors(_request: Request, err: faapi.exceptions.ParsingError):
+    return handle_http_exception(_request, ParsingError([err.__class__.__name__, *err.args[0:1]]))
 
 
 @app.exception_handler(faapi.exceptions.DisallowedPath)
-def handle_disallowed_path(_request: Request, _err: faapi.exceptions.ServerError):
-    return handle_http_exception(_request, DisallowedPath())
+def handle_disallowed_path(_request: Request, err: faapi.exceptions.DisallowedPath):
+    return handle_http_exception(_request, DisallowedPath(err.args[0] if err.args else None))
 
 
 @app.get("/favicon.ico", response_class=RedirectResponse, include_in_schema=False)
