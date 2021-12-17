@@ -37,6 +37,8 @@ from .models import iter_submission
 from .models import iter_user
 from .models import iter_user_partial
 
+root_folder: Path = Path(__file__).parent.parent
+
 database_limit: int = int(environ.get("DATABASE_LIMIT", 10000))
 
 logger: Logger = getLogger("uvicorn")
@@ -69,7 +71,7 @@ responses: dict[int, dict[str, Any]] = {
     status.HTTP_404_NOT_FOUND: {"description": "Not Found", "model": Error},
 }
 
-description: str = "\n".join((Path(__file__).parent.parent / "README.md").read_text().splitlines()[1:])
+description: str = "\n".join((root_folder / "README.md").read_text().splitlines()[1:])
 
 app: FastAPI = FastAPI(title="Fur Affinity API", servers=[{"url": "https://furaffinity-api.herokuapp.com"}],
                        version=__version__, openapi_tags=tags, description=description,
@@ -82,7 +84,7 @@ app.add_route("/redoc", lambda r: get_redoc_html(openapi_url="/openapi.json", ti
 app.add_route("/", lambda r: RedirectResponse("/docs"), ["GET"])
 app.add_route("/license", lambda r: RedirectResponse(app.license_info["url"]), ["GET"])
 app.add_route("/robots.json", lambda r: ORJSONResponse(robots), ["GET"])
-app.mount("/static", StaticFiles(directory=Path(__file__).parent.parent / "static"), "static")
+app.mount("/static", StaticFiles(directory=root_folder / "static"), "static")
 
 settings: Settings = Settings()
 
