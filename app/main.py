@@ -102,7 +102,7 @@ def startup():
 
 @app.exception_handler(HTTPException)
 def handle_http_exception(_request: Request, err: HTTPException):
-    return ORJSONResponse({"error": err.__class__.__name__, "details": err.detail}, err.status_code)
+    return ORJSONResponse({"detail": err.detail}, err.status_code)
 
 
 @app.exception_handler(faapi.exceptions.NoticeMessage)
