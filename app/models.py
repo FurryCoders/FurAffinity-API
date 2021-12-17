@@ -47,7 +47,7 @@ class Error(BaseModel):
     """
     Error response
     """
-    detail: Union[str, list[str]] = Field(description="details of the error")
+    detail: Optional[Union[str, list[str]]] = Field(description="details of the error")
 
 
 class Authorization(BaseModel):
