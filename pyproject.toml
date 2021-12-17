@@ -6,11 +6,11 @@ authors = ["Matteo Campinoti <matteo.campinoti94@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "3.10.1"
-faapi = "^3.1.0"
-fastapi = "^0.70.0"
-orjson = "^3.6.4"
-uvicorn = "^0.16.0"
-psycopg2-binary = "^2.9.2"
+faapi = "3.1.1"
+fastapi = "0.70.1"
+orjson = "3.6.5"
+uvicorn = "0.16.0"
+psycopg2-binary = "2.9.2"
 
 [tool.poetry.dev-dependencies]
 

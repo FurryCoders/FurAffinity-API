@@ -291,7 +291,7 @@ standard = ["httptools (>=0.2.0,<0.4.0)", "watchgod (>=0.6)", "python-dotenv (>=
 [metadata]
 lock-version = "1.1"
 python-versions = "3.10.1"
-content-hash = "c25f206cc38ba38d5e1d9dd794a6d1029b08d0da74448ee0a568acdfa3a74fbe"
+content-hash = "92bf7a32e9b7020621fbca647cb9321dd46d3f9c1a25237025e7126eb22c5efa"
 
 [metadata.files]
 anyio = [
