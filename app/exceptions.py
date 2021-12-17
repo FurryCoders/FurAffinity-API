@@ -20,3 +20,9 @@ class Unauthorized(HTTPException):
     def __init__(self, detail: Any = None, status_code: int = status.HTTP_401_UNAUTHORIZED,
                  headers: dict[str, Any] = None):
         super(Unauthorized, self).__init__(status_code, detail, headers)
+
+
+class ParsingError(HTTPException):
+    def __init__(self, detail: Any = None, status_code: int = status.HTTP_500_INTERNAL_SERVER_ERROR,
+                 headers: dict[str, Any] = None):
+        super(ParsingError, self).__init__(status_code, detail, headers)
