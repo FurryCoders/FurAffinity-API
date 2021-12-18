@@ -10,9 +10,8 @@ from fastapi import FastAPI
 from fastapi import Request
 from fastapi import status
 from fastapi.exceptions import HTTPException
-from fastapi.openapi.docs import get_redoc_html
-from fastapi.openapi.docs import get_swagger_ui_html
-from fastapi.responses import ORJSONResponse, HTMLResponse
+from fastapi.responses import HTMLResponse
+from fastapi.responses import ORJSONResponse
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from psycopg2 import connect
