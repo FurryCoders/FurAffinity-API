@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html lang="en">
+<head>
+    <title>Fur Affinity API - Swagger UI</title>
+    <link type="text/css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@3/swagger-ui.css">
+    <link href="/favicon.ico" rel="shortcut icon">
+    <link href="/touch-icon.png" rel="icon">
+    <link href="/touch-icon.png" rel="apple-touch-icon">
+    <link href="/touch-icon.png" rel="apple-touch-icon-precomposed">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Fully-featured and documented API for Fur Affinity">
+    <!-- meta og -->
+    <meta property="og:title" content="Fur Affinity API"/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:url" content="https://furaffinity-api.herokuapp.com"/>
+    <meta property="og:image" content="https://furaffinity-api.herokuapp.com/static/logo.png"/>
+    <meta property="og:image:alt" content="Stylized animal paw with two orange curly brackets">
+    <meta property="og:description" content="Fully-featured and documented API for Fur Affinity">
+    <!-- meta twitter -->
+    <meta name="twitter:card" content="summary"/>
+    <meta name="twitter:title" content="Fur Affinity API"/>
+    <meta name="twitter:url" content="https://furaffinity-api.herokuapp.com"/>
+    <meta name="twitter:image" content="https://furaffinity-api.herokuapp.com/static/logo.png">
+    <meta name="twitter:image:alt" content="Stylized animal paw with two orange curly brackets">
+    <meta name="twitter:description" content="Fully-featured and documented API for Fur Affinity">
+</head>
+<body>
+<div id="swagger-ui">
+</div>
+<script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@3/swagger-ui-bundle.js"></script>
+<script>
+    const ui = SwaggerUIBundle({
+        url: '/openapi.json',
+        dom_id: '#swagger-ui',
+        presets: [
+            SwaggerUIBundle.presets.apis,
+            SwaggerUIBundle.SwaggerUIStandalonePreset
+        ],
+        layout: "BaseLayout",
+        deepLinking: true,
+        showExtensions: true,
+        showCommonExtensions: true
+    })
+</script>
+</body>
+</html>
+    
