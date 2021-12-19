@@ -5,6 +5,7 @@ from pathlib import Path
 from time import time
 from typing import Any
 from typing import Callable
+from typing import Coroutine
 
 import faapi
 from fastapi import FastAPI
@@ -131,11 +132,11 @@ def handle_disallowed_path(_request: Request, err: faapi.exceptions.DisallowedPa
 
 
 @app.middleware("http")
-async def redirect_https(request: Request, call_next: Callable[[Request], Response]):
+async def redirect_https(request: Request, call_next: Callable[[Request], Coroutine[Any, Any, Response]]):
     if request.url.scheme.lower() == "http":
         return RedirectResponse("https" + str(request.url).removeprefix("http"))
     else:
-        return call_next(request)
+        return await call_next(request)
 
 
 @app.get("/favicon.ico", response_class=RedirectResponse, include_in_schema=False)
