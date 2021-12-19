@@ -4,10 +4,12 @@ from os import environ
 from pathlib import Path
 from time import time
 from typing import Any
+from typing import Callable
 
 import faapi
 from fastapi import FastAPI
 from fastapi import Request
+from fastapi import Response
 from fastapi import status
 from fastapi.exceptions import HTTPException
 from fastapi.responses import HTMLResponse
@@ -126,6 +128,14 @@ def handle_parsing_errors(_request: Request, err: faapi.exceptions.ParsingError)
 @app.exception_handler(faapi.exceptions.DisallowedPath)
 def handle_disallowed_path(_request: Request, err: faapi.exceptions.DisallowedPath):
     return handle_http_exception(_request, DisallowedPath(err.args[0] if err.args else None))
+
+
+@app.middleware("http")
+async def redirect_https(request: Request, call_next: Callable[[Request], Response]):
+    if request.url.scheme.lower() == "http":
+        return RedirectResponse("https" + str(request.url).removeprefix("http"))
+    else:
+        return call_next(request)
 
 
 @app.get("/favicon.ico", response_class=RedirectResponse, include_in_schema=False)
