@@ -8,6 +8,7 @@ from typing import Callable
 from typing import Coroutine
 
 import faapi
+from anybadge import Badge
 from fastapi import FastAPI
 from fastapi import Request
 from fastapi import Response
@@ -76,6 +77,8 @@ responses: dict[int, dict[str, Any]] = {
     status.HTTP_500_INTERNAL_SERVER_ERROR: {"description": "Server Error", "model": Error},
 }
 
+badge: Badge = Badge(label="furaffinity-api", value=__version__, default_color="#FAAF3A")
+
 description: str = "\n".join((root_folder / "README.md").read_text().splitlines()[1:])
 documentation_swagger: str = (root_folder / "docs" / "swagger.html").read_text()
 documentation_redoc: str = (root_folder / "docs" / "redoc.html").read_text()
@@ -138,6 +141,22 @@ async def redirect_https(request: Request, call_next: Callable[[Request], Corout
         return RedirectResponse("https" + str(request.url).removeprefix("http"))
     else:
         return await call_next(request)
+
+
+@app.get("/badge/shields.io", response_class=ORJSONResponse, include_in_schema=False)
+def badge_shields():
+    return {
+        "schemaVersion": 1,
+        "label": "furaffinity-api",
+        "message": __version__,
+        "color": "#FAAF3A",
+        "logoSvg": (static_folder / "logo.svg").read_text()
+    }
+
+
+@app.get("/badge.svg", response_class=Response, include_in_schema=False)
+def badge_svg():
+    return Response(str(badge), 201, media_type="image/svg+xml")
 
 
 @app.get("/favicon.ico", response_class=RedirectResponse, include_in_schema=False)
