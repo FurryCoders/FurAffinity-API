@@ -41,6 +41,7 @@ from .models import iter_user
 from .models import iter_user_partial
 
 root_folder: Path = Path(__file__).parent.parent
+static_folder: Path = root_folder / "static"
 
 database_limit: int = int(environ.get("DATABASE_LIMIT", 10000))
 
@@ -88,7 +89,7 @@ app.add_route("/redoc", lambda r: HTMLResponse(documentation_redoc), ["GET"])
 app.add_route("/", lambda r: RedirectResponse("/docs"), ["GET"])
 app.add_route("/license", lambda r: RedirectResponse(app.license_info["url"]), ["GET"])
 app.add_route("/robots.json", lambda r: ORJSONResponse(robots), ["GET"])
-app.mount("/static", StaticFiles(directory=root_folder / "static"), "static")
+app.mount("/static", StaticFiles(directory=static_folder), "static")
 
 settings: Settings = Settings()
 
