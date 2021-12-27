@@ -152,7 +152,7 @@ def badge_json():
     }
 
 
-@app.get("/badge/svg", response_class=Response, include_in_schema=False)
+@app.get("/badge/svg", response_class=RedirectResponse, include_in_schema=False)
 def badge_svg():
     badge_url: str = quote(app.servers[0]["url"] + app.url_path_for(badge_json.__name__))
     return RedirectResponse(f"https://img.shields.io/endpoint?url={badge_url}")
