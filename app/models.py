@@ -1,6 +1,5 @@
 from datetime import datetime
 from hashlib import sha1
-from typing import Any
 from typing import Optional
 from typing import Union
 
@@ -9,10 +8,6 @@ from pydantic import BaseModel
 from pydantic import Field
 
 from .exceptions import Unauthorized
-
-
-class Settings(BaseModel):
-    database: Any = None
 
 
 class Cookie(BaseModel):

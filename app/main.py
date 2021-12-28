@@ -1,8 +1,6 @@
 from logging import Logger
 from logging import getLogger
-from os import environ
 from pathlib import Path
-from time import time
 from typing import Any
 from typing import Callable
 from typing import Coroutine
@@ -18,7 +16,6 @@ from fastapi.responses import HTMLResponse
 from fastapi.responses import ORJSONResponse
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
-from psycopg2 import connect
 from uvicorn.config import LOGGING_CONFIG
 
 from .__version__ import __version__
@@ -26,12 +23,10 @@ from .exceptions import DisallowedPath
 from .exceptions import NotFound
 from .exceptions import ParsingError
 from .exceptions import Unauthorized
-from .models import Authorization
 from .models import Body
 from .models import Error
 from .models import Journal
 from .models import JournalsFolder
-from .models import Settings
 from .models import Submission
 from .models import SubmissionsFolder
 from .models import User
@@ -43,8 +38,6 @@ from .models import iter_user_partial
 
 root_folder: Path = Path(__file__).parent.parent
 static_folder: Path = root_folder / "static"
-
-database_limit: int = int(environ.get("DATABASE_LIMIT", 10000))
 
 logger: Logger = getLogger("uvicorn")
 LOGGING_CONFIG["formatters"]["access"]["fmt"] = \
@@ -92,18 +85,12 @@ app.add_route("/license", lambda r: RedirectResponse(app.license_info["url"]), [
 app.add_route("/robots.json", lambda r: ORJSONResponse(robots), ["GET"])
 app.mount("/static", StaticFiles(directory=static_folder), "static")
 
-settings: Settings = Settings()
-
 
 @app.on_event("startup")
 def startup():
     app.openapi()
     app.openapi_schema["info"]["x-logo"] = {"url": "/static/logo.png"}
     logger.info(f"Using faapi {faapi.__version__}")
-    settings.database = connect(environ["DATABASE_URL"], sslmode="require")
-    with settings.database.cursor() as cursor:
-        cursor.execute("create table if not exists AUTHS (ID character(40) primary key, ADDED float)")
-        settings.database.commit()
 
 
 @app.exception_handler(HTTPException)
@@ -111,8 +98,9 @@ def handle_http_exception(_request: Request, err: HTTPException):
     return ORJSONResponse({"detail": err.detail}, err.status_code)
 
 
+@app.exception_handler(faapi.exceptions.Unauthorized)
 @app.exception_handler(faapi.exceptions.NoticeMessage)
-def handle_notice_message(_request: Request, err: faapi.exceptions.NoticeMessage):
+def handle_notice_message(_request: Request, err: Exception | faapi.exceptions.ParsingError):
     return handle_http_exception(_request, Unauthorized(err.args[0] if err.args else None))
 
 
@@ -171,60 +159,12 @@ async def serve_touch_icon():
     return RedirectResponse("/static/logo.png", 301)
 
 
-@app.post("/auth/remove/", response_model=Authorization, response_class=ORJSONResponse, responses=responses,
-          tags=[tag_auth])
-async def deauthorize_cookies(body: Body):
-    """
-    Manually remove a cookie ID from authorisations database.
-    """
-    body.raise_for_unauthorized()
-    with settings.database.cursor() as cursor:
-        cursor.execute("select ID from AUTHS where ID = %s", (cookies_id := body.cookies_id(),))
-        if not cursor.fetchone():
-            return {"id": cookies_id}
-        cursor.execute("delete from AUTHS where ID = %s", (cookies_id,))
-        settings.database.commit()
-        logger.info(f"Deleted auth ID {cookies_id}")
-        return {"id": cookies_id, "exists": True, "removed": True}
-
-
-@app.post("/auth/add/", response_model=Authorization, response_class=ORJSONResponse, responses=responses,
-          tags=[tag_auth])
-async def authorize_cookies(body: Body):
-    """
-    Manually check cookies for authorization (whether they belong to a logged-in session or not).
-    A unique sha1 ID is created from the given cookies and saved in a database for future confirmation.
-
-    Because of the limited number of rows available in the database, authorization may be checked
-    again after some time.
-    """
-    body.raise_for_unauthorized()
-    with settings.database.cursor() as cursor:
-        cursor.execute("select ID from AUTHS where ID = %s", (cookies_id := body.cookies_id(),))
-        if cursor.fetchone():
-            return {"id": cookies_id, "exists": True, "added": False}
-        if not (api := faapi.FAAPI(body.cookies_list())).login_status:
-            raise Unauthorized("Not a login session")
-        cursor.execute("select count(ID) from AUTHS")
-        if (tot := cursor.fetchone()[0]) > database_limit:
-            cursor.execute("select ID from AUTHS order by ADDED limit %s", (tot - database_limit))
-            for delete_id in cursor.fetchall():
-                cursor.execute("delete from AUTHS where ID = %s", (delete_id,))
-                logger.info(f"Deleted auth ID {delete_id}")
-        cursor.execute("insert into AUTHS (ID, ADDED) values (%s, %s)", (cookies_id, time(),))
-        logger.info(f"Added auth ID {cookies_id}")
-        settings.database.commit()
-        api.handle_delay()
-        return {"id": cookies_id, "added": True}
-
-
 @app.post("/submission/{submission_id}/",
           response_model=Submission, response_class=ORJSONResponse, responses=responses, tags=[tag_subs])
 async def get_submission(submission_id: int, body: Body):
     """
     Get a submission
     """
-    await authorize_cookies(body)
     results = (api := faapi.FAAPI(body.cookies_list())).submission(submission_id)[0]
     api.handle_delay()
     return results
@@ -236,7 +176,6 @@ async def get_submission_file(submission_id: int, body: Body):
     """
     Redirect to a submission's file URL
     """
-    await authorize_cookies(body)
     results = (api := faapi.FAAPI(body.cookies_list())).submission(submission_id)[0]
     api.handle_delay()
     return RedirectResponse(results.file_url, status.HTTP_303_SEE_OTHER)
@@ -248,7 +187,6 @@ async def get_journal(journal_id: int, body: Body):
     """
     Get a journal
     """
-    await authorize_cookies(body)
     results = (api := faapi.FAAPI(body.cookies_list())).journal(journal_id)
     api.handle_delay()
     return results
@@ -259,7 +197,6 @@ async def get_login_user(body: Body):
     """
     Get the logged-in user's details, profile text, etc. The username may contain underscore (_) characters
     """
-    await authorize_cookies(body)
     results = (api := faapi.FAAPI(body.cookies_list())).me()
     api.handle_delay()
     return results
@@ -270,7 +207,6 @@ async def get_user(username: str, body: Body):
     """
     Get a user's details, profile text, etc. The username may contain underscore (_) characters
     """
-    await authorize_cookies(body)
     results = (api := faapi.FAAPI(body.cookies_list())).user(username.replace("_", ""))
     api.handle_delay()
     return results
@@ -282,7 +218,6 @@ async def get_user_watchlist_by(username: str, page: int, body: Body):
     """
     Get a list of users watched by {username}
     """
-    await authorize_cookies(body)
     r, n = (api := faapi.FAAPI(body.cookies_list())).watchlist_by(username.replace("_", ""), page)
     api.handle_delay()
     return {"results": r, "next": n or None}
@@ -294,7 +229,6 @@ async def get_user_watchlist_to(username: str, page: int, body: Body):
     """
     Get a list of users watching {username}
     """
-    await authorize_cookies(body)
     r, n = (api := faapi.FAAPI(body.cookies_list())).watchlist_to(username.replace("_", ""), page)
     api.handle_delay()
     return {"results": r, "next": n or None}
@@ -307,7 +241,6 @@ async def get_gallery(username: str, page: int, body: Body):
     """
     Get a list of submissions from the user's gallery folder.
     """
-    await authorize_cookies(body)
     r, n = (api := faapi.FAAPI(body.cookies_list())).gallery(username.replace("_", ""), page)
     api.handle_delay()
     return {"results": r, "next": n or None}
@@ -320,7 +253,6 @@ async def get_scraps(username: str, page: int, body: Body):
     """
     Get a list of submissions from the user's scraps folder.
     """
-    await authorize_cookies(body)
     r, n = (api := faapi.FAAPI(body.cookies_list())).scraps(username.replace("_", ""), page)
     api.handle_delay()
     return {"results": r, "next": n or None}
@@ -333,7 +265,6 @@ async def get_favorites(username: str, page: str, body: Body):
     """
     Get a list of submissions from the user's favorites folder. Starting page should be 0 or '/'.
     """
-    await authorize_cookies(body)
     r, n = (api := faapi.FAAPI(body.cookies_list())).favorites(username.replace("_", ""), page)
     api.handle_delay()
     return {"results": r, "next": n or None}
@@ -345,7 +276,6 @@ async def get_journals(username: str, page: int, body: Body):
     """
     Get a list of journals from the user's journals folder.
     """
-    await authorize_cookies(body)
     r, n = (api := faapi.FAAPI(body.cookies_list())).journals(username.replace("_", ""), page)
     api.handle_delay()
     return {"results": r, "next": n or None}
