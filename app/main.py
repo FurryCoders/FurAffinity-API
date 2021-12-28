@@ -51,13 +51,11 @@ faapi.Journal.__iter__ = iter_journal
 faapi.UserPartial.__iter__ = iter_user_partial
 faapi.User.__iter__ = iter_user
 
-tag_auth: str = "Authorization"
 tag_subs: str = "Submissions"
 tag_jrns: str = "Journals"
 tag_usrs: str = "User"
 
 tags: list[dict[str, Any]] = [
-    {"name": tag_auth, "description": "Authorize cookies"},
     {"name": tag_subs, "description": "Get submissions"},
     {"name": tag_jrns, "description": "Get journals"},
     {"name": tag_usrs, "description": "Get user information and folders"},
