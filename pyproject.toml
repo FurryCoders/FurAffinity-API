@@ -10,7 +10,6 @@ faapi = "3.2.0"
 fastapi = "0.70.1"
 orjson = "3.6.5"
 uvicorn = "0.16.0"
-psycopg2-binary = "2.9.2"
 
 [tool.poetry.dev-dependencies]
 
