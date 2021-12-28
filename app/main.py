@@ -68,6 +68,14 @@ responses: dict[int, dict[str, Any]] = {
     status.HTTP_500_INTERNAL_SERVER_ERROR: {"description": "Server Error", "model": Error},
 }
 
+badge: dict[str, str | int] = {
+    "schemaVersion": 1,
+    "label": "furaffinity-api",
+    "message": __version__,
+    "color": "#FAAF3A",
+    "logoSvg": (static_folder / "logo.svg").read_text()
+}
+
 description: str = "\n".join((root_folder / "README.md").read_text().splitlines()[1:])
 documentation_swagger: str = (root_folder / "docs" / "swagger.html").read_text()
 documentation_redoc: str = (root_folder / "docs" / "redoc.html").read_text()
@@ -129,13 +137,7 @@ async def redirect_https(request: Request, call_next: Callable[[Request], Corout
 
 @app.get("/badge/json", response_class=ORJSONResponse, include_in_schema=False)
 def badge_json():
-    return {
-        "schemaVersion": 1,
-        "label": "furaffinity-api",
-        "message": __version__,
-        "color": "#FAAF3A",
-        "logoSvg": (static_folder / "logo.svg").read_text()
-    }
+    return badge
 
 
 @app.get("/badge/svg", response_class=RedirectResponse, include_in_schema=False)
