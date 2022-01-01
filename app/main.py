@@ -5,6 +5,7 @@ from typing import Any
 from typing import Callable
 from typing import Coroutine
 from urllib.parse import quote
+from urllib.robotparser import RobotFileParser
 
 import faapi
 from fastapi import FastAPI
@@ -43,9 +44,8 @@ logger: Logger = getLogger("uvicorn")
 LOGGING_CONFIG["formatters"]["access"]["fmt"] = \
     '%(levelprefix)s %(asctime)s %(client_addr)s - %(request_line)s %(status_code)s %(msecs).0fms'
 
-robots: dict[str, list[str]] = faapi.connection.get_robots()
-faapi.connection.get_robots = lambda: robots
-faapi.FAAPI.check_path = lambda *_: None
+robots: RobotFileParser = faapi.connection.get_robots(faapi.connection.make_session([]))
+faapi.connection.get_robots = lambda *_: robots
 faapi.Submission.__iter__ = iter_submission
 faapi.Journal.__iter__ = iter_journal
 faapi.UserPartial.__iter__ = iter_user_partial
