@@ -101,7 +101,7 @@ def get_badge(endpoint: str, query_params: str) -> Response:
     return Response(
         res.content,
         res.status_code,
-        media_type=res.headers.get("content-Type", None)
+        media_type=res.headers.get("Content-Type", None)
     )
 
 
