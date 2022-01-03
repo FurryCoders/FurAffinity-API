@@ -20,6 +20,7 @@ from fastapi.staticfiles import StaticFiles
 from uvicorn.config import LOGGING_CONFIG
 
 from .__version__ import __version__
+from .description import description
 from .exceptions import DisallowedPath
 from .exceptions import NotFound
 from .exceptions import ParsingError
@@ -78,7 +79,6 @@ badge: dict[str, str | int] = {
     "logoSvg": (static_folder / "logo.svg").read_text()
 }
 
-description: str = "\n".join((root_folder / "README.md").read_text().splitlines()[1:])
 documentation_swagger: str = (root_folder / "docs" / "swagger.html").read_text()
 documentation_redoc: str = (root_folder / "docs" / "redoc.html").read_text()
 
