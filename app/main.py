@@ -1,13 +1,14 @@
+from functools import cache
 from logging import Logger
 from logging import getLogger
 from pathlib import Path
 from typing import Any
 from typing import Callable
 from typing import Coroutine
-from urllib.parse import quote
 from urllib.robotparser import RobotFileParser
 
 import faapi
+import requests
 from fastapi import FastAPI
 from fastapi import Request
 from fastapi import Response
@@ -94,6 +95,17 @@ app.add_route("/robots.json", lambda r: ORJSONResponse(robots_serialised), ["GET
 app.mount("/static", StaticFiles(directory=static_folder), "static")
 
 
+@cache
+def get_badge(endpoint: str, query_params: str) -> Response:
+    print("not cached", endpoint, query_params)
+    res: requests.Response = requests.request("GET", f"https://img.shields.io/endpoint?url={endpoint}&{query_params}")
+    return Response(
+        res.content,
+        res.status_code,
+        media_type=res.headers.get("content-Type", None)
+    )
+
+
 @app.on_event("startup")
 def startup():
     app.openapi()
@@ -142,10 +154,9 @@ def badge_json():
     return badge
 
 
-@app.get("/badge/svg", response_class=RedirectResponse, include_in_schema=False)
-def badge_svg():
-    badge_url: str = quote(app.servers[0]["url"] + app.url_path_for(badge_json.__name__))
-    return RedirectResponse(f"https://img.shields.io/endpoint?url={badge_url}")
+@app.get("/badge/svg", response_class=Response, include_in_schema=False)
+def badge_svg(request: Request):
+    return get_badge(app.servers[0]["url"] + app.url_path_for(badge_json.__name__), str(request.query_params))
 
 
 @app.get("/favicon.ico", response_class=RedirectResponse, include_in_schema=False)
