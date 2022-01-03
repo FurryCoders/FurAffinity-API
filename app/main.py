@@ -36,6 +36,7 @@ from .models import iter_journal
 from .models import iter_submission
 from .models import iter_user
 from .models import iter_user_partial
+from .models import serialise_object
 
 root_folder: Path = Path(__file__).parent.parent
 static_folder: Path = root_folder / "static"
@@ -45,6 +46,7 @@ LOGGING_CONFIG["formatters"]["access"]["fmt"] = \
     '%(levelprefix)s %(asctime)s %(client_addr)s - %(request_line)s %(status_code)s %(msecs).0fms'
 
 robots: RobotFileParser = faapi.connection.get_robots(faapi.connection.make_session([]))
+robots_serialised: dict = serialise_object(robots.__dict__)
 faapi.connection.get_robots = lambda *_: robots
 faapi.Submission.__iter__ = iter_submission
 faapi.Journal.__iter__ = iter_journal
@@ -88,7 +90,7 @@ app.add_route("/docs", lambda r: HTMLResponse(documentation_swagger), ["GET"])
 app.add_route("/redoc", lambda r: HTMLResponse(documentation_redoc), ["GET"])
 app.add_route("/", lambda r: RedirectResponse("/docs"), ["GET"])
 app.add_route("/license", lambda r: RedirectResponse(app.license_info["url"]), ["GET"])
-app.add_route("/robots.json", lambda r: ORJSONResponse(robots), ["GET"])
+app.add_route("/robots.json", lambda r: ORJSONResponse(robots_serialised), ["GET"])
 app.mount("/static", StaticFiles(directory=static_folder), "static")
 
 

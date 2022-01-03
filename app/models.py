@@ -1,5 +1,6 @@
 from datetime import datetime
 from hashlib import sha1
+from typing import Any
 from typing import Optional
 from typing import Union
 
@@ -198,3 +199,18 @@ def iter_user_partial(usr: faapi.UserPartial):
     yield "title", usr.title
     yield "join_date", usr.join_date if usr.join_date.timestamp() > 0 else None
     yield "user_icon_url", usr.user_icon_url
+
+
+def serialise_object(obj: object) -> Any:
+    if isinstance(obj, (str, int, float, bool)):
+        return obj
+    elif isinstance(obj, (tuple, list)):
+        return list(map(serialise_object, obj))
+    elif isinstance(obj, dict):
+        return {k: serialise_object(v) for k, v in obj.items()}
+    elif hasattr(obj, "__dict__"):
+        return {k: serialise_object(v) for k, v in obj.__dict__.items()}
+    elif hasattr(obj, "__str__"):
+        return str(obj)
+    else:
+        return repr(obj)
