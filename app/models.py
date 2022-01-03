@@ -202,7 +202,9 @@ def iter_user_partial(usr: faapi.UserPartial):
 
 
 def serialise_object(obj: object) -> Any:
-    if isinstance(obj, (str, int, float, bool)):
+    if obj is None:
+        return obj
+    elif isinstance(obj, (str, int, float, bool)):
         return obj
     elif isinstance(obj, (tuple, list)):
         return list(map(serialise_object, obj))
