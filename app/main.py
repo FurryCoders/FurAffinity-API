@@ -97,7 +97,6 @@ app.mount("/static", StaticFiles(directory=static_folder), "static")
 
 @cache
 def get_badge(endpoint: str, query_params: str) -> Response:
-    print("not cached", endpoint, query_params)
     res: requests.Response = requests.request("GET", f"https://img.shields.io/endpoint?url={endpoint}&{query_params}")
     return Response(
         res.content,
