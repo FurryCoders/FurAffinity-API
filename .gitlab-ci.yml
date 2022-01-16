@@ -11,7 +11,7 @@ mypy:
   before_script:
     - python -m pip install mypy types-beautifulsoup4
   script:
-    - python -m mypy --install-types --non-interactive app
+    - python -m mypy --install-types --non-interactive --ignore-missing-imports --follow-imports=skip --strict-optional app
 
 flake8:
   stage: Static Analysis
