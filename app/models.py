@@ -4,7 +4,7 @@ from typing import Any
 from typing import Optional
 from typing import Union
 
-import faapi
+import faapi  # type:ignore
 from pydantic import BaseModel
 from pydantic import Field
 

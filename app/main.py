@@ -7,7 +7,7 @@ from typing import Callable
 from typing import Coroutine
 from urllib.robotparser import RobotFileParser
 
-import faapi
+import faapi  # type:ignore
 import requests
 from fastapi import FastAPI
 from fastapi import Request
@@ -18,7 +18,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.responses import ORJSONResponse
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
-from uvicorn.config import LOGGING_CONFIG
+from uvicorn.config import LOGGING_CONFIG  # type:ignore
 
 from .__version__ import __version__
 from .description import description
@@ -65,7 +65,7 @@ tags: list[dict[str, Any]] = [
     {"name": tag_usrs, "description": "Get user information and folders"},
 ]
 
-responses: dict[int, dict[str, Any]] = {
+responses: dict[int | str, dict[str, Any]] = {
     status.HTTP_401_UNAUTHORIZED: {"description": "Unauthorized", "model": Error},
     status.HTTP_403_FORBIDDEN: {"description": "Forbidden", "model": Error},
     status.HTTP_404_NOT_FOUND: {"description": "Not Found", "model": Error},
@@ -90,7 +90,7 @@ app: FastAPI = FastAPI(title="Fur Affinity API", servers=[{"url": "https://furaf
 app.add_route("/docs", lambda r: HTMLResponse(documentation_swagger), ["GET"])
 app.add_route("/redoc", lambda r: HTMLResponse(documentation_redoc), ["GET"])
 app.add_route("/", lambda r: RedirectResponse("/docs"), ["GET"])
-app.add_route("/license", lambda r: RedirectResponse(app.license_info["url"]), ["GET"])
+app.add_route("/license", lambda r: RedirectResponse((app.license_info or {}).get("url", "")), ["GET"])
 app.add_route("/robots.json", lambda r: ORJSONResponse(robots_serialised), ["GET"])
 app.mount("/static", StaticFiles(directory=static_folder), "static")
 
@@ -117,24 +117,28 @@ def handle_http_exception(_request: Request, err: HTTPException):
     return ORJSONResponse({"detail": err.detail}, err.status_code)
 
 
+# noinspection PyTypeChecker
 @app.exception_handler(faapi.exceptions.Unauthorized)
 @app.exception_handler(faapi.exceptions.NoticeMessage)
 def handle_notice_message(_request: Request, err: Exception | faapi.exceptions.ParsingError):
     return handle_http_exception(_request, Unauthorized(err.args[0] if err.args else None))
 
 
+# noinspection PyTypeChecker
 @app.exception_handler(faapi.exceptions.ServerError)
 @app.exception_handler(faapi.exceptions.DisabledAccount)
 def handle_server_error(_request: Request, err: faapi.exceptions.ParsingError):
     return handle_http_exception(_request, NotFound([err.__class__.__name__, *err.args[0:1]]))
 
 
+# noinspection PyTypeChecker
 @app.exception_handler(faapi.exceptions.NoTitle)
 @app.exception_handler(faapi.exceptions.NonePage)
 def handle_parsing_errors(_request: Request, err: faapi.exceptions.ParsingError):
     return handle_http_exception(_request, ParsingError([err.__class__.__name__, *err.args[0:1]]))
 
 
+# noinspection PyTypeChecker
 @app.exception_handler(faapi.exceptions.DisallowedPath)
 def handle_disallowed_path(_request: Request, err: faapi.exceptions.DisallowedPath):
     return handle_http_exception(_request, DisallowedPath(err.args[0] if err.args else None))

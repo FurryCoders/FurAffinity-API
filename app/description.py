@@ -1,4 +1,4 @@
-from faapi import __version__ as faapi_version
+from faapi import __version__ as faapi_version  # type:ignore
 
 description: str = f"""
 [![](https://img.shields.io/gitlab/v/tag/MatteoCampinoti94/furaffinity-api?label=version&sort=date&logo=gitlab)](https://gitlab.com/MatteoCampinoti94/furaffinity-api)
