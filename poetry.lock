@@ -92,7 +92,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
 [[package]]
 name = "faapi"
-version = "3.3.3"
+version = "3.3.5"
 description = "Python module to implement API-like functionality for the FurAffinity.net website."
 category = "main"
 optional = false
@@ -103,7 +103,7 @@ beautifulsoup4 = ">=4.9.1,<5.0.0"
 cfscrape = ">=2.1.1,<3.0.0"
 lxml = ">=4.7.1,<5.0.0"
 python-dateutil = ">=2.8.1,<3.0.0"
-requests = ">=2.24.0,<3.0.0"
+requests = ">=2.27.1,<3.0.0"
 
 [[package]]
 name = "fastapi"
@@ -283,7 +283,7 @@ standard = ["websockets (>=10.0)", "httptools (>=0.2.0,<0.4.0)", "watchgod (>=0.
 [metadata]
 lock-version = "1.1"
 python-versions = "3.10.1"
-content-hash = "c6c8b75ffb38a23b85d10a6237c508eff961542ee98668f78b0ec6d3d44c2854"
+content-hash = "9328b93e3f9e1041d0e985983584c9642f62de5662f5e57201acc81a02f114cf"
 
 [metadata.files]
 anyio = [
@@ -319,8 +319,8 @@ colorama = [
     {file = "colorama-0.4.4.tar.gz", hash = "sha256:5941b2b48a20143d2267e95b1c2a7603ce057ee39fd88e7329b0c292aa16869b"},
 ]
 faapi = [
-    {file = "faapi-3.3.3-py3-none-any.whl", hash = "sha256:16b62190cb122e5769b7108ac0ebc5262db970fddcdfd1539a956c531f0ac42b"},
-    {file = "faapi-3.3.3.tar.gz", hash = "sha256:216a4fe4c0d60efaf5657f06ce13e3520c9fc8cb01468a715548f750e985605d"},
+    {file = "faapi-3.3.5-py3-none-any.whl", hash = "sha256:a31fbc29d184fa4c3c1c133f3783796ade45d20c1c7e03bc3837dc40ce8f35bd"},
+    {file = "faapi-3.3.5.tar.gz", hash = "sha256:e7cfec349cdac2e05852fd8c6fb5d70dc941c501201009cae695320c2ff8f37b"},
 ]
 fastapi = [
     {file = "fastapi-0.71.0-py3-none-any.whl", hash = "sha256:a78eca6b084de9667f2d5f37e2ae297270e5a119cd01c2f04815795da92fc87f"},
