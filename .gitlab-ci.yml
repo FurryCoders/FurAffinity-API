@@ -1,7 +1,27 @@
+image: python:3.10
+
+before_script:
+  - python --version
+
 stages:
-  - deploy
+  - Static Analysis
+  - Deploy
+
+mypy:
+  stage: Static Analysis
+  before_script:
+    - python -m pip install mypy types-beautifulsoup4
+  script:
+    - python -m mypy --install-types --non-interactive app
+
+flake8:
+  stage: Static Analysis
+  before_script:
+    - python -m pip install flake8
+  script:
+    - python -m flake8 --max-line-length=120 app
 
 Deployment:
-  stage: deploy
+  stage: Deploy
   script:
     - git push --follow-tags https://$(echo -n $HEROKU_USERNAME | sed -e "s/@/%40/g"):$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP.git HEAD:main
