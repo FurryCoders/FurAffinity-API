@@ -1,5 +1,3 @@
-image: python:3.10
-
 before_script:
   - python --version
 
@@ -9,6 +7,7 @@ stages:
 
 mypy:
   stage: Static Analysis
+  image: python:3.10
   before_script:
     - python -m pip install mypy types-beautifulsoup4
   script:
@@ -16,6 +15,7 @@ mypy:
 
 flake8:
   stage: Static Analysis
+  image: python:3.10
   before_script:
     - python -m pip install flake8
   script:
@@ -23,5 +23,8 @@ flake8:
 
 Deployment:
   stage: Deploy
+  image: ruby:3.1
+  before_script:
+    - gem install dpl
   script:
-    - git push --follow-tags https://$(echo -n $HEROKU_USERNAME | sed -e "s/@/%40/g"):$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP.git HEAD:main
+    - dpl --provider=heroku --app=$HEROKU_APP --api-key=$HEROKU_API_KEY
