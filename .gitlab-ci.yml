@@ -1,6 +1,3 @@
-before_script:
-  - python --version
-
 stages:
   - Static Analysis
   - Deploy
