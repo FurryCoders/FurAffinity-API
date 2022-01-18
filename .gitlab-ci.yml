@@ -19,7 +19,7 @@ flake8:
   before_script:
     - python -m pip install flake8
   script:
-    - python -m flake8 --max-line-length=120 app
+    - python -m flake8 --max-line-length=120 --exclude app/description.py app
 
 Deployment:
   stage: Deploy
