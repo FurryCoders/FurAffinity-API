@@ -117,18 +117,31 @@ def handle_http_exception(_request: Request, err: HTTPException):
     return ORJSONResponse({"detail": err.detail}, err.status_code)
 
 
-@app.exception_handler(Exception)
-def handle_exception(request: Request, err: Exception):
-    if isinstance(err, (faapi.exceptions.Unauthorized, faapi.exceptions.NoticeMessage)):
-        return handle_http_exception(request, Unauthorized(err.args[0] if err.args else None))
-    elif isinstance(err, (faapi.exceptions.ServerError, faapi.exceptions.DisabledAccount)):
-        return handle_http_exception(request, NotFound([err.__class__.__name__, *err.args[0:1]]))
-    elif isinstance(err, (faapi.exceptions.NoTitle, faapi.exceptions.NonePage)):
-        return handle_http_exception(request, ParsingError([err.__class__.__name__, *err.args[0:1]]))
-    elif isinstance(err, faapi.exceptions.DisallowedPath):
-        return handle_http_exception(request, DisallowedPath(err.args[0] if err.args else None))
-    else:
-        return handle_http_exception(request, HTTPException(503, [err.__class__.__name__, *err.args[0:1]]))
+# noinspection PyTypeChecker
+@app.exception_handler(faapi.exceptions.Unauthorized)
+@app.exception_handler(faapi.exceptions.NoticeMessage)
+def handle_notice_message(_request: Request, err: Exception | faapi.exceptions.ParsingError):
+    return handle_http_exception(_request, Unauthorized(err.args[0] if err.args else None))
+
+
+# noinspection PyTypeChecker
+@app.exception_handler(faapi.exceptions.ServerError)
+@app.exception_handler(faapi.exceptions.DisabledAccount)
+def handle_server_error(_request: Request, err: faapi.exceptions.ParsingError):
+    return handle_http_exception(_request, NotFound([err.__class__.__name__, *err.args[0:1]]))
+
+
+# noinspection PyTypeChecker
+@app.exception_handler(faapi.exceptions.NoTitle)
+@app.exception_handler(faapi.exceptions.NonePage)
+def handle_parsing_errors(_request: Request, err: faapi.exceptions.ParsingError):
+    return handle_http_exception(_request, ParsingError([err.__class__.__name__, *err.args[0:1]]))
+
+
+# noinspection PyTypeChecker
+@app.exception_handler(faapi.exceptions.DisallowedPath)
+def handle_disallowed_path(_request: Request, err: faapi.exceptions.DisallowedPath):
+    return handle_http_exception(_request, DisallowedPath(err.args[0] if err.args else None))
 
 
 @app.middleware("http")
