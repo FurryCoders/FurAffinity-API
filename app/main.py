@@ -48,7 +48,7 @@ LOGGING_CONFIG["formatters"]["access"]["fmt"] = \
     '%(levelprefix)s %(asctime)s %(client_addr)s - %(request_line)s %(status_code)s %(msecs).0fms'
 
 robots: RobotFileParser = faapi.connection.get_robots(faapi.connection.make_session([]))
-robots_serialised: dict = serialise_object(robots.__dict__)
+robots_serialised: dict = serialise_object(robots)
 faapi.connection.get_robots = lambda *_: robots
 faapi.Submission.__iter__ = iter_submission
 faapi.Journal.__iter__ = iter_journal
