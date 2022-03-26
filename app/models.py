@@ -52,7 +52,7 @@ class UserStats(BaseModel):
     """
     views: int = Field(description="Number of views")
     submissions: int = Field(description="Number of submissions")
-    favs: int = Field(description="Number of favorites")
+    favorites: int = Field(description="Number of favorites")
     comments_earned: int = Field(description="Number of comments earned")
     comments_made: int = Field(description="Number of comments made")
     journals: int = Field(description="Number of journals")
