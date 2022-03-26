@@ -84,6 +84,15 @@ class User(BaseModel):
     user_icon_url: str = Field(description="URL to user's icon")
 
 
+class SubmissionStats(BaseModel):
+    """
+    Submission statistics
+    """
+    views: int = Field(description="Number of views")
+    comments: int = Field(description="Number of comments")
+    favorites: int = Field(description="Number of favorites")
+
+
 class SubmissionPartial(BaseModel):
     """
     Simplified submission information
@@ -110,11 +119,19 @@ class Submission(BaseModel):
     gender: str = Field(description="Submission's gender")
     rating: str = Field(description="Submission's rating (e.g. general, mature, etc.)")
     type: str = Field(description="Submission's type (i.e. image, text, music)")
+    stats: SubmissionStats
     description: str = Field(description="Submission's description")
     mentions: list[str] = Field(description="Submission's mentions (users mentioned with FA links in the description)")
     folder: str = Field(description="Submission's folder (i.e. gallery or scraps)")
     file_url: str = Field(description="URL to submission's file")
     thumbnail_url: str = Field(description="URL to submission's thumbnail")
+
+
+class JournalStats(BaseModel):
+    """
+    Journal statistics
+    """
+    comments: int = Field(description="Number of comments")
 
 
 class Journal(BaseModel):
@@ -124,6 +141,7 @@ class Journal(BaseModel):
     id: int = Field(description="Journal's ID")
     title: str = Field(description="Journal's title")
     author: UserPartial
+    stats: JournalStats
     date: datetime = Field(description="Journal's upload date")
     content: str = Field(description="Journal's title")
     mentions: list[str] = Field(description="Journal's mentions (users mentioned with FA links in the content)")
@@ -156,8 +174,10 @@ class Watchlist(BaseModel):
 def iter_journal(jrn: faapi.Journal):
     yield "id", jrn.id
     yield "title", jrn.title
-    yield "date", jrn.date
     yield "author", jrn.author
+    yield "date", jrn.date
+    # noinspection PyProtectedMember
+    yield "stats", jrn.stats._asdict()
     yield "content", jrn.content
     yield "mentions", jrn.mentions
 
@@ -167,6 +187,8 @@ def iter_submission(sub: faapi.Submission):
     yield "title", sub.title
     yield "author", sub.author
     yield "date", sub.date
+    # noinspection PyProtectedMember
+    yield "stats", sub.stats._asdict()
     yield "tags", sub.tags
     yield "category", sub.category
     yield "species", sub.species
