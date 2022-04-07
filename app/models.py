@@ -1,10 +1,8 @@
 from datetime import datetime
 from hashlib import sha1
 from typing import Any
-from typing import ForwardRef
 from typing import TypeAlias
 
-import faapi  # type:ignore
 from pydantic import BaseModel
 from pydantic import Field
 
