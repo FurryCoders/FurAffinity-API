@@ -2,8 +2,6 @@ from datetime import datetime
 from hashlib import sha1
 from typing import Any
 from typing import ForwardRef
-from typing import Optional
-from typing import Union
 
 import faapi  # type:ignore
 from pydantic import BaseModel
@@ -44,7 +42,7 @@ class Error(BaseModel):
     """
     Error response
     """
-    detail: Optional[Union[str, list[str]]] = Field(description="details of the error")
+    detail: str | list[str] | None = Field(description="details of the error")
 
 
 class UserStats(BaseModel):
@@ -64,10 +62,10 @@ class UserPartial(BaseModel):
     Simplified user information
     """
     name: str = Field(description="User's name (as it appears on their page)")
-    status: Optional[str] = Field(description="User's status (~, !, etc.)")
+    status: str | None = Field(description="User's status (~, !, etc.)")
     title: str = Field(description="User's title")
     user_icon_url: str = Field(description="URL to user's icon")
-    join_date: Optional[datetime] = Field(description="User's join date")
+    join_date: datetime | None = Field(description="User's join date")
 
 
 class User(BaseModel):
@@ -77,7 +75,7 @@ class User(BaseModel):
     name: str = Field(description="User's name (as it appears on their page)")
     status: str = Field(description="User's status (~, !, etc.)")
     title: str = Field(description="User's title")
-    join_date: Optional[datetime] = Field(description="User's join date")
+    join_date: datetime | None = Field(description="User's join date")
     profile: str = Field(description="User's profile text in HTML format")
     stats: UserStats = Field(description="User's statistics")
     info: dict[str, str] = Field(description="User's info (e.g. Accepting Commissions, Favorite Music, etc.)")
@@ -191,7 +189,7 @@ class SubmissionsFolder(BaseModel):
     Submissions appearing in a submissions page (e.g. gallery page)
     """
     results: list[SubmissionPartial] = Field(description="List of submissions found in the page")
-    next: Optional[Union[int, str]] = Field(description="Number of the next page, null if last page")
+    next: int | str | None = Field(description="Number of the next page, null if last page")
 
 
 class JournalsFolder(BaseModel):
@@ -199,7 +197,7 @@ class JournalsFolder(BaseModel):
     Journals appearing in a journals page
     """
     results: list[JournalPartial] = Field(description="List of journals found in the page")
-    next: Optional[int] = Field(description="Number of the next page, null if last page")
+    next: int | None = Field(description="Number of the next page, null if last page")
 
 
 class Watchlist(BaseModel):
@@ -207,7 +205,7 @@ class Watchlist(BaseModel):
     Users appearing in a user's watchlist
     """
     results: list[UserPartial] = Field(description="List of users found in the page")
-    next: Optional[int] = Field(description="Number of the next page, null if last page")
+    next: int | None = Field(description="Number of the next page, null if last page")
 
 
 def serialise_object(obj: object) -> Any:
