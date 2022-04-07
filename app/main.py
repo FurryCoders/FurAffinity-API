@@ -34,11 +34,6 @@ from .models import Submission
 from .models import SubmissionsFolder
 from .models import User
 from .models import Watchlist
-from .models import iter_comment
-from .models import iter_journal
-from .models import iter_submission
-from .models import iter_user
-from .models import iter_user_partial
 from .models import serialise_object
 
 root_folder: Path = Path(__file__).parent.parent
@@ -51,11 +46,6 @@ LOGGING_CONFIG["formatters"]["access"]["fmt"] = \
 robots: RobotFileParser = faapi.connection.get_robots(faapi.connection.make_session([{"name": "a", "value": "0"}]))
 robots_serialised: dict = serialise_object(robots)
 faapi.connection.get_robots = lambda *_: robots
-faapi.Submission.__iter__ = iter_submission
-faapi.Journal.__iter__ = iter_journal
-faapi.UserPartial.__iter__ = iter_user_partial
-faapi.User.__iter__ = iter_user
-faapi.Comment.__iter__ = iter_comment
 
 tag_subs: str = "Submissions"
 tag_jrns: str = "Journals"
