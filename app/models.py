@@ -157,9 +157,22 @@ class JournalStats(BaseModel):
     comments: int = Field(description="Number of comments")
 
 
+class JournalPartial(BaseModel):
+    """
+    Journal information without comments as it appears in the journals' page
+    """
+    id: int = Field(description="Journal's ID")
+    title: str = Field(description="Journal's title")
+    author: UserPartial
+    stats: JournalStats
+    date: datetime = Field(description="Journal's upload date")
+    content: str = Field(description="Journal's content")
+    mentions: list[str] = Field(description="Journal's mentions (users mentioned with FA links in the content)")
+
+
 class Journal(BaseModel):
     """
-    Journal information as it appears in the journals' page
+    Journal information as it appears in the journal's page
     """
     id: int = Field(description="Journal's ID")
     title: str = Field(description="Journal's title")
@@ -183,7 +196,7 @@ class JournalsFolder(BaseModel):
     """
     Journals appearing in a journals page
     """
-    results: list[Journal] = Field(description="List of journals found in the page")
+    results: list[JournalPartial] = Field(description="List of journals found in the page")
     next: Optional[int] = Field(description="Number of the next page, null if last page")
 
 
