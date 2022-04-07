@@ -148,6 +148,8 @@ class Submission(BaseModel):
     file_url: str = Field(description="URL to submission's file")
     thumbnail_url: str = Field(description="URL to submission's thumbnail")
     comments: list[Comment] = Field(description="Submission's comments")
+    prev: int | None = Field(description="ID of previous submission")
+    next: int | None = Field(description="ID of previous submission")
 
 
 class JournalStats(BaseModel):
