@@ -47,7 +47,7 @@ logger: Logger = getLogger("uvicorn")
 LOGGING_CONFIG["formatters"]["access"]["fmt"] = \
     '%(levelprefix)s %(asctime)s %(client_addr)s - %(request_line)s %(status_code)s %(msecs).0fms'
 
-robots: RobotFileParser = faapi.connection.get_robots(faapi.connection.make_session([]))
+robots: RobotFileParser = faapi.connection.get_robots(faapi.connection.make_session([{"name": "a", "value": "0"}]))
 robots_serialised: dict = serialise_object(robots)
 faapi.connection.get_robots = lambda *_: robots
 faapi.Submission.__iter__ = iter_submission
