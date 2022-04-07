@@ -147,6 +147,7 @@ class Submission(BaseModel):
     folder: str = Field(description="Submission's folder (i.e. gallery or scraps)")
     file_url: str = Field(description="URL to submission's file")
     thumbnail_url: str = Field(description="URL to submission's thumbnail")
+    comments: list[Comment] = Field(description="Submission's comments")
 
 
 class JournalStats(BaseModel):
@@ -167,6 +168,7 @@ class Journal(BaseModel):
     date: datetime = Field(description="Journal's upload date")
     content: str = Field(description="Journal's content")
     mentions: list[str] = Field(description="Journal's mentions (users mentioned with FA links in the content)")
+    comments: list[Comment] = Field(description="Journal's comments")
 
 
 class SubmissionsFolder(BaseModel):
@@ -202,6 +204,7 @@ def iter_journal(jrn: faapi.Journal):
     yield "stats", jrn.stats._asdict()
     yield "content", jrn.content
     yield "mentions", jrn.mentions
+    yield "comments", jrn.comments
 
 
 def iter_submission(sub: faapi.Submission):
@@ -222,6 +225,7 @@ def iter_submission(sub: faapi.Submission):
     yield "folder", sub.folder
     yield "file_url", sub.file_url
     yield "thumbnail_url", sub.thumbnail_url
+    yield "comments", sub.comments
 
 
 def iter_user(usr: faapi.User):
