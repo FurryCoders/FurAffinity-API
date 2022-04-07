@@ -1,7 +1,7 @@
+from __future__ import annotations
 from datetime import datetime
 from hashlib import sha1
 from typing import Any
-from typing import TypeAlias
 
 from pydantic import BaseModel
 from pydantic import Field
@@ -82,9 +82,6 @@ class User(BaseModel):
     user_icon_url: str = Field(description="URL to user's icon")
 
 
-CommentType: TypeAlias = "Comment"
-
-
 # noinspection PyRedeclaration
 class Comment(BaseModel):
     """
@@ -94,10 +91,13 @@ class Comment(BaseModel):
     author: UserPartial
     date: datetime = Field(description="Comment's post date")
     text: str = Field(description="Comment's content")
-    replies: list[CommentType] = Field(description="Replies to the comment")
+    replies: list[Comment] = Field(description="Replies to the comment")
     reply_to: int | None = Field(description="ID of the parent comment, if any")
     edited: bool = Field(description="Whether the comment was edited")
     hidden: bool = Field(description="Whether the comment is hidden")
+
+
+Comment.update_forward_refs()
 
 
 class SubmissionStats(BaseModel):
