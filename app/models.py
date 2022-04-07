@@ -143,7 +143,7 @@ class Journal(BaseModel):
     author: UserPartial
     stats: JournalStats
     date: datetime = Field(description="Journal's upload date")
-    content: str = Field(description="Journal's title")
+    content: str = Field(description="Journal's content")
     mentions: list[str] = Field(description="Journal's mentions (users mentioned with FA links in the content)")
 
 
