@@ -34,6 +34,7 @@ from .models import Submission
 from .models import SubmissionsFolder
 from .models import User
 from .models import Watchlist
+from .models import iter_comment
 from .models import iter_journal
 from .models import iter_submission
 from .models import iter_user
@@ -54,6 +55,7 @@ faapi.Submission.__iter__ = iter_submission
 faapi.Journal.__iter__ = iter_journal
 faapi.UserPartial.__iter__ = iter_user_partial
 faapi.User.__iter__ = iter_user
+faapi.Comment.__iter__ = iter_comment
 
 tag_subs: str = "Submissions"
 tag_jrns: str = "Journals"

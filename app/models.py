@@ -1,6 +1,7 @@
 from datetime import datetime
 from hashlib import sha1
 from typing import Any
+from typing import ForwardRef
 from typing import Optional
 from typing import Union
 
@@ -82,6 +83,27 @@ class User(BaseModel):
     info: dict[str, str] = Field(description="User's info (e.g. Accepting Commissions, Favorite Music, etc.)")
     contacts: dict[str, str] = Field(description="User's contacts (e.g. Twitter, Telegram, etc.)")
     user_icon_url: str = Field(description="URL to user's icon")
+
+
+Comment = ForwardRef("Comment")
+
+
+# noinspection PyRedeclaration
+class Comment(BaseModel):
+    """
+    Comment information and text
+    """
+    id: int = Field(description="Comment's ID")
+    author: UserPartial
+    date: datetime = Field(description="Comment's post date")
+    text: str = Field(description="Comment's content")
+    replies: list[Comment] = Field(description="Replies to the comment")
+    reply_to: int | None = Field(description="ID of the parent comment, if any")
+    edited: bool = Field(description="Whether the comment was edited")
+    hidden: bool = Field(description="Whether the comment is hidden")
+
+
+Comment.update_forward_refs()
 
 
 class SubmissionStats(BaseModel):
@@ -221,6 +243,17 @@ def iter_user_partial(usr: faapi.UserPartial):
     yield "title", usr.title
     yield "join_date", usr.join_date if usr.join_date.timestamp() > 0 else None
     yield "user_icon_url", usr.user_icon_url
+
+
+def iter_comment(comment: faapi.Comment):
+    yield "id", comment.id
+    yield "author", dict(comment.author)
+    yield "date", comment.date
+    yield "text", comment.text
+    yield "replies", [dict(r) for r in comment.replies]
+    yield "reply_to", comment.reply_to.id if comment.reply_to else None
+    yield "edited", comment.edited
+    yield "hidden", comment.hidden
 
 
 def serialise_object(obj: object) -> Any:
