@@ -1,5 +1,6 @@
 from faapi import __version__ as faapi_version  # type:ignore
 
+# noinspection SpellCheckingInspection
 description: str = f"""
 [![](https://img.shields.io/github/v/tag/FurryCoders/furaffinity-api?label=github&sort=date&logo=github&color=blue)](https://github.com/FurryCoders/furaffinity-api)
 [![](https://img.shields.io/github/workflow/status/FurryCoders/furaffinity-api/Test?label=Test&logo=githubactions)](https://github.com/FurryCoders/furaffinity-api/actions/workflows/test.yml)
