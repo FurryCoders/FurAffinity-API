@@ -80,6 +80,10 @@ class User(BaseModel):
     info: dict[str, str] = Field(description="User's info (e.g. Accepting Commissions, Favorite Music, etc.)")
     contacts: dict[str, str] = Field(description="User's contacts (e.g. Twitter, Telegram, etc.)")
     user_icon_url: str = Field(description="URL to user's icon")
+    watched: bool = Field(description="Watch status of the user")
+    watched_toggle_link: str | None = Field(description="Link to toggle watch status of the user")
+    blocked: bool = Field(description="Block status of the user")
+    blocked_toggle_link: str | None = Field(description="Link to toggle block status of the user")
 
 
 # noinspection PyRedeclaration
@@ -144,6 +148,8 @@ class Submission(BaseModel):
     comments: list[Comment] = Field(description="Submission's comments")
     prev: int | None = Field(description="ID of previous submission")
     next: int | None = Field(description="ID of previous submission")
+    favorite: bool = Field(description="Favorite status of the submission")
+    favorite_toggle_link: str = Field(description="Link to toggle favorite status of the submission")
 
 
 class JournalStats(BaseModel):
@@ -175,6 +181,8 @@ class Journal(BaseModel):
     author: UserPartial
     stats: JournalStats
     date: datetime = Field(description="Journal's upload date")
+    header: str = Field(description="Journal's header")
+    footer: str = Field(description="Journal's footer")
     content: str = Field(description="Journal's content")
     mentions: list[str] = Field(description="Journal's mentions (users mentioned with FA links in the content)")
     comments: list[Comment] = Field(description="Journal's comments")
