@@ -31,6 +31,7 @@ from .models import Error
 from .models import Journal
 from .models import JournalsFolder
 from .models import Submission
+from .models import SubmissionPartial
 from .models import SubmissionsFolder
 from .models import User
 from .models import Watchlist
@@ -165,6 +166,17 @@ async def serve_favicon():
 @app.get("/apple-touch-icon-precomposed.png", response_class=RedirectResponse, include_in_schema=False)
 async def serve_touch_icon():
     return RedirectResponse("/static/logo.png", 301)
+
+
+@app.post("/frontpage/", response_model=list[SubmissionPartial], response_class=ORJSONResponse, responses=responses,
+          tags=[tag_subs])
+async def get_frontpage(body: Body):
+    """
+    Get the most recent submissions.
+    """
+    results = (api := faapi.FAAPI(body.cookies_list())).frontpage()
+    api.handle_delay()
+    return results
 
 
 @app.post("/submission/{submission_id}/",
