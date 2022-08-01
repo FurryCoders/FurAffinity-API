@@ -40,10 +40,6 @@ from .models import serialise_object
 root_folder: Path = Path(__file__).parent.parent
 static_folder: Path = root_folder / "static"
 
-logger: Logger = getLogger("uvicorn")
-LOGGING_CONFIG["formatters"]["access"]["fmt"] = \
-    '%(levelprefix)s %(asctime)s %(client_addr)s - %(request_line)s %(status_code)s %(msecs).0fms'
-
 robots: RobotFileParser = faapi.connection.get_robots(faapi.connection.make_session([{"name": "a", "value": "0"}]))
 robots_serialised: dict = serialise_object(robots)
 faapi.connection.get_robots = lambda *_: robots
@@ -102,7 +98,6 @@ def get_badge(endpoint: str, query_params: str) -> Response:
 def startup():
     app.openapi()
     app.openapi_schema["info"]["x-logo"] = {"url": "/static/logo.png"}
-    logger.info(f"Using faapi {faapi.__version__}")
 
 
 @app.exception_handler(HTTPException)
