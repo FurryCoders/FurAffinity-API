@@ -16,7 +16,6 @@ from fastapi.responses import HTMLResponse
 from fastapi.responses import ORJSONResponse
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
-from uvicorn.config import LOGGING_CONFIG  # type:ignore
 
 from .__version__ import __version__
 from .description import description
