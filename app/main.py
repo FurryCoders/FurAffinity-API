@@ -1,6 +1,4 @@
 from functools import cache
-from logging import Logger
-from logging import getLogger
 from pathlib import Path
 from typing import Any
 from typing import Callable
