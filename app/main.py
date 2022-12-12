@@ -5,7 +5,7 @@ from typing import Callable
 from typing import Coroutine
 from urllib.robotparser import RobotFileParser
 
-import faapi  # type:ignore
+import faapi
 import requests
 from fastapi import FastAPI
 from fastapi import Request
