@@ -151,7 +151,7 @@ class Submission(BaseModel):
     footer: str = Field(description="Submission's footer")
     mentions: list[str] = Field(description="Submission's mentions (users mentioned with FA links in the description)")
     folder: str = Field(description="Submission's folder (i.e. gallery or scraps)")
-    user_folder: list[SubmissionUserFolder] = Field(description="User-defined folder(s)")
+    user_folders: list[SubmissionUserFolder] = Field(description="User-defined folder(s)")
     file_url: str = Field(description="URL to submission's file")
     thumbnail_url: str = Field(description="URL to submission's thumbnail")
     comments: list[Comment] = Field(description="Submission's comments")
