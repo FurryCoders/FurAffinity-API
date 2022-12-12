@@ -63,7 +63,7 @@ class UserPartial(BaseModel):
     name: str = Field(description="User's name (as it appears on their page)")
     status: str | None = Field(description="User's status (~, !, etc.)")
     title: str = Field(description="User's title")
-    user_icon_url: str = Field(description="URL to user's icon")
+    avatar_url: str = Field(description="URL to user's icon")
     join_date: datetime | None = Field(description="User's join date")
 
 
@@ -79,7 +79,8 @@ class User(BaseModel):
     stats: UserStats = Field(description="User's statistics")
     info: dict[str, str] = Field(description="User's info (e.g. Accepting Commissions, Favorite Music, etc.)")
     contacts: dict[str, str] = Field(description="User's contacts (e.g. Twitter, Telegram, etc.)")
-    user_icon_url: str = Field(description="URL to user's icon")
+    avatar_url: str = Field(description="URL to user's icon")
+    banner_url: str | None = Field(description="URL to user's banner (if present)")
     watched: bool = Field(description="Watch status of the user")
     watched_toggle_link: str | None = Field(description="Link to toggle watch status of the user")
     blocked: bool = Field(description="Block status of the user")
@@ -113,6 +114,12 @@ class SubmissionStats(BaseModel):
     favorites: int = Field(description="Number of favorites")
 
 
+class SubmissionUserFolder(BaseModel):
+    name: str = Field(description="Folder name")
+    url: str = Field(description="URL to folder")
+    group: str = Field(description="Folder group (if any)")
+
+
 class SubmissionPartial(BaseModel):
     """
     Simplified submission information
@@ -141,8 +148,10 @@ class Submission(BaseModel):
     type: str = Field(description="Submission's type (i.e. image, text, music)")
     stats: SubmissionStats
     description: str = Field(description="Submission's description")
+    footer: str = Field(description="Submission's footer")
     mentions: list[str] = Field(description="Submission's mentions (users mentioned with FA links in the description)")
     folder: str = Field(description="Submission's folder (i.e. gallery or scraps)")
+    user_folder: list[SubmissionUserFolder] = Field(description="User-defined folder(s)")
     file_url: str = Field(description="URL to submission's file")
     thumbnail_url: str = Field(description="URL to submission's thumbnail")
     comments: list[Comment] = Field(description="Submission's comments")
