@@ -25,6 +25,7 @@ class Body(BaseModel):
     Request body with authentication fields
     """
     cookies: list[Cookie] = Field(description="A list of cookies to use to authenticate the request")
+    bbcode: bool = Field(description="Set to true to return text fields in BBCode format", default=False)
 
     def cookies_list(self) -> list[dict[str, str]]:
         return [c.to_dict() for c in self.cookies]
