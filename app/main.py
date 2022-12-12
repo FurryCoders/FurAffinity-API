@@ -178,6 +178,8 @@ async def get_submission(submission_id: int, body: Body):
     Get a submission
     """
     results = (api := faapi.FAAPI(body.cookies_list())).submission(submission_id)[0]
+    if body.bbcode:
+        results.description = results.description_bbcode
     api.handle_delay()
     return results
 
@@ -201,6 +203,10 @@ async def get_journal(journal_id: int, body: Body):
     """
     results = (api := faapi.FAAPI(body.cookies_list())).journal(journal_id)
     api.handle_delay()
+    if body.bbcode:
+        results.content = results.content_bbcode
+        results.header = results.header_bbcode
+        results.footer = results.footer_bbcode
     return results
 
 
@@ -210,6 +216,8 @@ async def get_login_user(body: Body):
     Get the logged-in user's details, profile text, etc. The username may contain underscore (_) characters
     """
     results = (api := faapi.FAAPI(body.cookies_list())).me()
+    if body.bbcode:
+        results.profile = results.profile_bbcode
     api.handle_delay()
     return results
 
@@ -220,6 +228,8 @@ async def get_user(username: str, body: Body):
     Get a user's details, profile text, etc. The username may contain underscore (_) characters
     """
     results = (api := faapi.FAAPI(body.cookies_list())).user(username.replace("_", ""))
+    if body.bbcode:
+        results.profile = results.profile_bbcode
     api.handle_delay()
     return results
 
@@ -288,6 +298,9 @@ async def get_journals(username: str, page: int, body: Body):
     """
     Get a list of journals from the user's journals folder.
     """
-    r, n = (api := faapi.FAAPI(body.cookies_list())).journals(username.replace("_", ""), page)
+    rs, n = (api := faapi.FAAPI(body.cookies_list())).journals(username.replace("_", ""), page)
+    if body.bbcode:
+        for r in rs:
+            r.content = r.content_bbcode
     api.handle_delay()
-    return {"results": r, "next": n or None}
+    return {"results": rs, "next": n or None}
