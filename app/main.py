@@ -173,7 +173,7 @@ async def get_frontpage(body: Body):
     """
     results = (api := faapi.FAAPI(body.cookies_list())).frontpage()
     api.handle_delay()
-    return results
+    return [dict(r) for r in results]
 
 
 @app.post("/submission/{submission_id}/",
@@ -186,7 +186,7 @@ async def get_submission(submission_id: int, body: Body):
     if body.bbcode:
         results.description = results.description_bbcode
     api.handle_delay()
-    return results
+    return dict(results)
 
 
 @app.post("/submission/{submission_id}/file/",
@@ -212,7 +212,7 @@ async def get_journal(journal_id: int, body: Body):
         results.content = results.content_bbcode
         results.header = results.header_bbcode
         results.footer = results.footer_bbcode
-    return results
+    return dict(results)
 
 
 @app.post("/me/", response_model=User, response_class=ORJSONResponse, responses=responses, tags=[tag_usrs])
@@ -224,7 +224,7 @@ async def get_login_user(body: Body):
     if body.bbcode:
         results.profile = results.profile_bbcode
     api.handle_delay()
-    return results
+    return dict(results)
 
 
 @app.post("/user/{username}/", response_model=User, response_class=ORJSONResponse, responses=responses, tags=[tag_usrs])
@@ -236,7 +236,7 @@ async def get_user(username: str, body: Body):
     if body.bbcode:
         results.profile = results.profile_bbcode
     api.handle_delay()
-    return results
+    return dict(results)
 
 
 @app.post("/user/{username}/watchlist/by/{page}/", response_model=Watchlist, response_class=ORJSONResponse,
@@ -247,7 +247,7 @@ async def get_user_watchlist_by(username: str, page: int, body: Body):
     """
     r, n = (api := faapi.FAAPI(body.cookies_list())).watchlist_by(username.replace("_", ""), page)
     api.handle_delay()
-    return {"results": r, "next": n or None}
+    return {"results": [dict(u) for u in r], "next": n or None}
 
 
 @app.post("/user/{username}/watchlist/to/{page}/", response_model=Watchlist, response_class=ORJSONResponse,
@@ -258,7 +258,7 @@ async def get_user_watchlist_to(username: str, page: int, body: Body):
     """
     r, n = (api := faapi.FAAPI(body.cookies_list())).watchlist_to(username.replace("_", ""), page)
     api.handle_delay()
-    return {"results": r, "next": n or None}
+    return {"results": [dict(u) for u in r], "next": n or None}
 
 
 @app.post("/user/{username}/gallery/{page}/",
@@ -270,7 +270,7 @@ async def get_gallery(username: str, page: int, body: Body):
     """
     r, n = (api := faapi.FAAPI(body.cookies_list())).gallery(username.replace("_", ""), page)
     api.handle_delay()
-    return {"results": r, "next": n or None}
+    return {"results": [dict(s) for s in r], "next": n or None}
 
 
 @app.post("/user/{username}/scraps/{page}/",
@@ -282,7 +282,7 @@ async def get_scraps(username: str, page: int, body: Body):
     """
     r, n = (api := faapi.FAAPI(body.cookies_list())).scraps(username.replace("_", ""), page)
     api.handle_delay()
-    return {"results": r, "next": n or None}
+    return {"results": [dict(s) for s in r], "next": n or None}
 
 
 @app.post("/user/{username}/favorites/{page:path}",
@@ -294,7 +294,7 @@ async def get_favorites(username: str, page: str, body: Body):
     """
     r, n = (api := faapi.FAAPI(body.cookies_list())).favorites(username.replace("_", ""), page)
     api.handle_delay()
-    return {"results": r, "next": n or None}
+    return {"results": [dict(s) for s in r], "next": n or None}
 
 
 @app.post("/user/{username}/journals/{page}/",
@@ -308,4 +308,4 @@ async def get_journals(username: str, page: int, body: Body):
         for r in rs:
             r.content = r.content_bbcode
     api.handle_delay()
-    return {"results": rs, "next": n or None}
+    return {"results": [dict(j) for j in rs], "next": n or None}
