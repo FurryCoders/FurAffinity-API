@@ -16,6 +16,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.responses import ORJSONResponse
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
+from requests import Session
 
 from .__version__ import __version__
 from .description import description
@@ -37,7 +38,10 @@ from .models import serialise_object
 root_folder: Path = Path(__file__).parent.parent
 static_folder: Path = root_folder / "static"
 
-robots: RobotFileParser = faapi.connection.get_robots(faapi.connection.make_session([{"name": "a", "value": "0"}]))
+robots: RobotFileParser = faapi.connection.get_robots(faapi.connection.make_session(
+    [{"name": "a", "value": "0"}],
+    Session
+))
 robots_serialised: dict = serialise_object(robots)
 faapi.connection.get_robots = lambda *_: robots
 
@@ -76,7 +80,7 @@ app: FastAPI = FastAPI(title="Fur Affinity API", servers=[{"url": "https://furaf
 app.add_route("/docs", lambda r: HTMLResponse(documentation_swagger), ["GET"])
 app.add_route("/redoc", lambda r: HTMLResponse(documentation_redoc), ["GET"])
 app.add_route("/", lambda r: RedirectResponse("/docs"), ["GET"])
-app.add_route("/license", lambda r: RedirectResponse((app.license_info or {}).get("url", "")), ["GET"])
+app.add_route("/license", lambda r: RedirectResponse("https://eupl.eu/1.2/en"), ["GET"])
 app.add_route("/robots.json", lambda r: ORJSONResponse(robots_serialised), ["GET"])
 app.mount("/static", StaticFiles(directory=static_folder), "static")
 
@@ -144,7 +148,8 @@ def badge_json():
 
 @app.get("/badge/svg", response_class=Response, include_in_schema=False)
 def badge_svg(request: Request):
-    return get_badge(app.servers[0]["url"] + app.url_path_for(badge_json.__name__), str(request.query_params))
+    return get_badge("https://furaffinity-api.herokuapp.com" + app.url_path_for(badge_json.__name__),
+                     str(request.query_params))
 
 
 @app.get("/favicon.ico", response_class=RedirectResponse, include_in_schema=False)
