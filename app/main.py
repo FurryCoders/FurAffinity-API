@@ -73,7 +73,15 @@ badge: dict[str, str | int] = {
 documentation_swagger: str = (root_folder / "docs" / "swagger.html").read_text()
 documentation_redoc: str = (root_folder / "docs" / "redoc.html").read_text()
 
-app: FastAPI = FastAPI(title="Fur Affinity API")
+app: FastAPI = FastAPI(title="Fur Affinity API", servers=[{"url": "https://furaffinity-api.herokuapp.com"}],
+                       version=__version__, openapi_tags=tags, description=description,
+                       license_info={"name": "European Union Public Licence v. 1.2", "url": "https://eupl.eu/1.2/en"},
+                       docs_url=None, redoc_url=None)
+app.add_route("/docs", lambda r: HTMLResponse(documentation_swagger), ["GET"])
+app.add_route("/redoc", lambda r: HTMLResponse(documentation_redoc), ["GET"])
+app.add_route("/", lambda r: RedirectResponse("/docs"), ["GET"])
+app.add_route("/license", lambda r: RedirectResponse("https://eupl.eu/1.2/en"), ["GET"])
+app.add_route("/robots.json", lambda r: ORJSONResponse(robots_serialised), ["GET"])
 app.mount("/static", StaticFiles(directory=static_folder), "static")
 
 
@@ -125,6 +133,14 @@ def handle_disallowed_path(_request: Request, err: faapi.exceptions.DisallowedPa
     return handle_http_exception(_request, DisallowedPath(err.args[0] if err.args else None))
 
 
+@app.middleware("http")
+async def redirect_https(request: Request, call_next: Callable[[Request], Coroutine[Any, Any, Response]]):
+    if request.url.scheme.lower() == "http":
+        return RedirectResponse("https" + str(request.url).removeprefix("http"))
+    else:
+        return await call_next(request)
+
+
 @app.get("/badge/json", response_class=ORJSONResponse, include_in_schema=False)
 def badge_json():
     return badge
@@ -157,7 +173,7 @@ async def get_frontpage(body: Body):
     """
     results = (api := faapi.FAAPI(body.cookies_list())).frontpage()
     api.handle_delay()
-    return [dict(r) for r in results]
+    return results
 
 
 @app.post("/submission/{submission_id}/",
@@ -170,7 +186,7 @@ async def get_submission(submission_id: int, body: Body):
     if body.bbcode:
         results.description = results.description_bbcode
     api.handle_delay()
-    return dict(results)
+    return results
 
 
 @app.post("/submission/{submission_id}/file/",
@@ -196,7 +212,7 @@ async def get_journal(journal_id: int, body: Body):
         results.content = results.content_bbcode
         results.header = results.header_bbcode
         results.footer = results.footer_bbcode
-    return dict(results)
+    return results
 
 
 @app.post("/me/", response_model=User, response_class=ORJSONResponse, responses=responses, tags=[tag_usrs])
@@ -208,7 +224,7 @@ async def get_login_user(body: Body):
     if body.bbcode:
         results.profile = results.profile_bbcode
     api.handle_delay()
-    return dict(results)
+    return results
 
 
 @app.post("/user/{username}/", response_model=User, response_class=ORJSONResponse, responses=responses, tags=[tag_usrs])
@@ -220,7 +236,7 @@ async def get_user(username: str, body: Body):
     if body.bbcode:
         results.profile = results.profile_bbcode
     api.handle_delay()
-    return dict(results)
+    return results
 
 
 @app.post("/user/{username}/watchlist/by/{page}/", response_model=Watchlist, response_class=ORJSONResponse,
@@ -231,7 +247,7 @@ async def get_user_watchlist_by(username: str, page: int, body: Body):
     """
     r, n = (api := faapi.FAAPI(body.cookies_list())).watchlist_by(username.replace("_", ""), page)
     api.handle_delay()
-    return {"results": [dict(u) for u in r], "next": n or None}
+    return {"results": r, "next": n or None}
 
 
 @app.post("/user/{username}/watchlist/to/{page}/", response_model=Watchlist, response_class=ORJSONResponse,
@@ -242,7 +258,7 @@ async def get_user_watchlist_to(username: str, page: int, body: Body):
     """
     r, n = (api := faapi.FAAPI(body.cookies_list())).watchlist_to(username.replace("_", ""), page)
     api.handle_delay()
-    return {"results": [dict(u) for u in r], "next": n or None}
+    return {"results": r, "next": n or None}
 
 
 @app.post("/user/{username}/gallery/{page}/",
@@ -254,7 +270,7 @@ async def get_gallery(username: str, page: int, body: Body):
     """
     r, n = (api := faapi.FAAPI(body.cookies_list())).gallery(username.replace("_", ""), page)
     api.handle_delay()
-    return {"results": [dict(s) for s in r], "next": n or None}
+    return {"results": r, "next": n or None}
 
 
 @app.post("/user/{username}/scraps/{page}/",
@@ -266,7 +282,7 @@ async def get_scraps(username: str, page: int, body: Body):
     """
     r, n = (api := faapi.FAAPI(body.cookies_list())).scraps(username.replace("_", ""), page)
     api.handle_delay()
-    return {"results": [dict(s) for s in r], "next": n or None}
+    return {"results": r, "next": n or None}
 
 
 @app.post("/user/{username}/favorites/{page:path}",
@@ -278,7 +294,7 @@ async def get_favorites(username: str, page: str, body: Body):
     """
     r, n = (api := faapi.FAAPI(body.cookies_list())).favorites(username.replace("_", ""), page)
     api.handle_delay()
-    return {"results": [dict(s) for s in r], "next": n or None}
+    return {"results": r, "next": n or None}
 
 
 @app.post("/user/{username}/journals/{page}/",
@@ -292,4 +308,4 @@ async def get_journals(username: str, page: int, body: Body):
         for r in rs:
             r.content = r.content_bbcode
     api.handle_delay()
-    return {"results": [dict(j) for j in rs], "next": n or None}
+    return {"results": rs, "next": n or None}
