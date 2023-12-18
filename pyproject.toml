@@ -5,11 +5,11 @@ description = ""
 authors = ["Matteo Campinoti <matteo.campinoti94@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.10"
-faapi = "3.10.0"
-fastapi = "0.88.0"
-orjson = "3.8.3"
-uvicorn = "0.20.0"
+python = "3.12.1"
+faapi = "3.11.4"
+fastapi = "0.105.0"
+orjson = "3.9.10"
+uvicorn = "0.24.0"
 
 [tool.poetry.dev-dependencies]
 
