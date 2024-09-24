@@ -118,6 +118,7 @@ def handle_notice_message(_request: Request, err: Exception | faapi.exceptions.P
 # noinspection PyTypeChecker
 @app.exception_handler(faapi.exceptions.ServerError)
 @app.exception_handler(faapi.exceptions.DisabledAccount)
+@app.exception_handler(faapi.exceptions.NotFound)
 def handle_server_error(_request: Request, err: faapi.exceptions.ParsingError):
     return handle_http_exception(_request, NotFound([err.__class__.__name__, *err.args[0:1]]))
 
