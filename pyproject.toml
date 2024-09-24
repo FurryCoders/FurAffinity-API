@@ -5,7 +5,7 @@ description = ""
 authors = ["Matteo Campinoti <matteo.campinoti94@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "3.12.1"
+python = "3.12.5"
 faapi = "3.11.4"
 fastapi = "0.105.0"
 orjson = "3.9.10"
