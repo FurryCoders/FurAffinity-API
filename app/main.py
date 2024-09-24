@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from functools import cache
 from pathlib import Path
 from typing import Any
@@ -73,10 +74,17 @@ badge: dict[str, str | int] = {
 documentation_swagger: str = (root_folder / "docs" / "swagger.html").read_text()
 documentation_redoc: str = (root_folder / "docs" / "redoc.html").read_text()
 
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    _app.openapi()
+    _app.openapi_schema["info"]["x-logo"] = {"url": "/static/logo.png"}
+    yield
+
 app: FastAPI = FastAPI(title="Fur Affinity API", servers=[{"url": "https://furaffinity-api.herokuapp.com"}],
                        version=__version__, openapi_tags=tags, description=description,
                        license_info={"name": "European Union Public Licence v. 1.2", "url": "https://eupl.eu/1.2/en"},
-                       docs_url=None, redoc_url=None)
+                       docs_url=None, redoc_url=None, lifespan=lifespan)
 app.add_route("/docs", lambda r: HTMLResponse(documentation_swagger), ["GET"])
 app.add_route("/redoc", lambda r: HTMLResponse(documentation_redoc), ["GET"])
 app.add_route("/", lambda r: RedirectResponse("/docs"), ["GET"])
@@ -93,12 +101,6 @@ def get_badge(endpoint: str, query_params: str) -> Response:
         res.status_code,
         media_type=res.headers.get("Content-Type", None)
     )
-
-
-@app.on_event("startup")
-def startup():
-    app.openapi()
-    app.openapi_schema["info"]["x-logo"] = {"url": "/static/logo.png"}
 
 
 @app.exception_handler(HTTPException)
