@@ -5,13 +5,18 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+env:
+  PYTHON_VERSION: 3.12.5
+
 jobs:
   flake8:
     name: Flake8
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
       - name: Style Test
         id: test
         run: |
@@ -22,8 +27,10 @@ jobs:
     name: mypy
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
       - name: Types test
         id: test
         run: |
