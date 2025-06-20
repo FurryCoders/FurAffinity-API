@@ -144,7 +144,7 @@ class Submission(BaseModel):
     tags: list[str] = Field(description="Submission's tags")
     category: str = Field(description="Submission's category (e.g. Artwork)")
     species: str = Field(description="Submission's species")
-    gender: str = Field(description="Submission's gender")
+    gender: str | None = Field(description="Submission's gender")
     rating: str = Field(description="Submission's rating (e.g. general, mature, etc.)")
     type: str = Field(description="Submission's type (i.e. image, text, music)")
     stats: SubmissionStats
