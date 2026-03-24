@@ -177,6 +177,7 @@ class JournalPartial(BaseModel):
     title: str = Field(description="Journal's title")
     author: UserPartial
     stats: JournalStats
+    rating: str
     date: datetime = Field(description="Journal's upload date")
     content: str = Field(description="Journal's content")
     mentions: list[str] = Field(description="Journal's mentions (users mentioned with FA links in the content)")
@@ -190,6 +191,7 @@ class Journal(BaseModel):
     title: str = Field(description="Journal's title")
     author: UserPartial
     stats: JournalStats
+    rating: str
     date: datetime = Field(description="Journal's upload date")
     header: str = Field(description="Journal's header")
     footer: str = Field(description="Journal's footer")
