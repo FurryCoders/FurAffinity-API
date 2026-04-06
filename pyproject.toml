@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "app"
-version = "1.5.8"
+version = "1.5.9"
 description = ""
 authors = ["Matteo Campinoti <matteo.campinoti94@gmail.com>"]
 
