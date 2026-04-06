@@ -6,7 +6,7 @@ authors = ["Matteo Campinoti <matteo.campinoti94@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "3.13.12"
-faapi = "3.12.1"
+faapi = "3.12.2"
 fastapi = "0.115.0"
 orjson = "3.10.7"
 uvicorn = "0.30.6"
