@@ -212,14 +212,14 @@ files = [
 
 [[package]]
 name = "faapi"
-version = "3.12.5"
+version = "3.12.6"
 description = "Python module to implement API-like functionality for the FurAffinity.net website."
 optional = false
 python-versions = "<4.0,>=3.9"
 groups = ["main"]
 files = [
-    {file = "faapi-3.12.5-py3-none-any.whl", hash = "sha256:1d80abf21d3acbc6f971b3b11a8f8217b2e588cfacea360b2fc34faae017e58a"},
-    {file = "faapi-3.12.5.tar.gz", hash = "sha256:8e17d0cdd61c92aeef93f9285a8cb00776d411fde705e16ac92b71b05f0259e1"},
+    {file = "faapi-3.12.6-py3-none-any.whl", hash = "sha256:1b54bd5ce0edff52e5f48eeb7f2dce68e92d713f410fb74c9b5cec86c3a4d1dd"},
+    {file = "faapi-3.12.6.tar.gz", hash = "sha256:feb2d783296640026d528d81ca3368d0cef7226d1679c221a193214878c5f0bb"},
 ]
 
 [package.dependencies]
@@ -792,4 +792,4 @@ standard = ["colorama (>=0.4) ; sys_platform == \"win32\"", "httptools (>=0.5.0)
 [metadata]
 lock-version = "2.1"
 python-versions = "3.13.13"
-content-hash = "3df3391b1451f394807c0e383f08db44e598e639ad92357eb76f5e4a6214a5c9"
+content-hash = "ebeecf90721eb5e810b034b6778f7e8618064b4b3e4ff045d365da5b8bc828d6"
